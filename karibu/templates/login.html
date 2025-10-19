@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karibu Groceries - Login</title>
+  {% load static %}
+{% block content %}
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: #7DE5B6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      gap: 0;
+    }
+
+    .left-section {
+      flex: 1;
+      background: url("{% static 'images/banana.jpeg' %}") no-repeat center center/cover;
+      padding: 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      position: relative;
+      margin: 0;
+    }
+
+    .left-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 1;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+    }
+
+    .left-content h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      color: #7DE5B6;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .left-content p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .tagline {
+      font-size: 1.8rem;
+      font-style: italic;
+      color: #FFD700;
+      font-family: 'Brush Script MT', cursive;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .signup-link {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      color: white;
+      font-size: 1rem;
+    }
+
+    .signup-link a {
+      color: #7DE5B6;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .right-section {
+      flex: 0 0 500px;
+        background: var(--form-bg);
+      /* background: #0eff; */
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0;
+    }
+
+    .login-box {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin: 0;
+    }
+
+    .login-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .key-icon {
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      background: #f8f9fa;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #7DE5B6;
+      background: white;
+    }
+
+    .privacy-note {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 0.5rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .remember-me label {
+      color: #555;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: #C85D5D;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .login-btn:hover {
+      background: #B04545;
+    }
+
+    .forgot-password {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      color: #333;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .question-icon {
+      color: #F5A623;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .left-section {
+        flex: 0 0 40%;
+        padding: 2rem;
+      }
+
+      .left-content h1 {
+        font-size: 2rem;
+      }
+
+      .right-section {
+        flex: 1;
+        padding: 2rem;
+      }
+    }
+    .forgot-password {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.forgot-password-link {
+  color: #C85D5D;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-section">
+      <div class="left-content">
+        <h1>Welcome to Karibu Groceries Limited</h1>
+        <p>Your workspace awaits—log in to continue. Track sales, manage inventory, and oversee operations all from your dashboard. Sign in to get started!</p>
+        <div class="tagline">Freshness Delivered to Your Doorstep!</div>
+      </div>
+      <div class="signup-link">
+        Don't have an account?
+        <a href="{% url 'signup' %}">📋 Sign up</a>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <div class="login-box">
+        <div class="login-header">
+          <span class="key-icon">🔑</span>
+          Sign in
+        </div>
+        <form method="post" action="{% url 'login' %}" class="auth-form">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="error-messages">
+      {% for error in form.non_field_errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="your username" required>
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="your password" required>
+  </div>
+
+  <div class="remember-me">
+    <input type="checkbox" id="remember" name="remember_me">
+    <label for="remember">Remember me</label>
+  </div>
+
+  <button type="submit" class="login-btn">Login</button>
+</form>
+
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}
+</body>
+</html>

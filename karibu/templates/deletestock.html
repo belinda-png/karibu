@@ -1,0 +1,572 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Delete {{ stock.item_name }} - Confirm Deletion{% endblock %}
+
+{% block content %}
+<div class="delete-confirmation-container">
+    <!-- Header Section -->
+    <div class="confirmation-header">
+        <div class="header-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="header-content">
+            <h1>Confirm Deletion</h1>
+            <p class="subtitle">This action cannot be undone</p>
+        </div>
+    </div>
+
+    <div class="confirmation-content">
+        <!-- Warning Card -->
+        <div class="warning-card">
+            <div class="warning-header">
+                <i class="fas fa-trash-alt"></i>
+                <h2>Delete Stock Item</h2>
+            </div>
+            
+            <div class="warning-body">
+                <div class="stock-summary">
+                    <div class="stock-info">
+                        <div class="info-item">
+                            <span class="label">Item Name:</span>
+                            <span class="value">{{ stock.item_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Category:</span>
+                            <span class="value">{{ stock.category_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Current Quantity:</span>
+                            <span class="value">{{ stock.product_quantity }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Unit Price:</span>
+                            <span class="value">UGX {{ stock.unit_price }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deletion-warning">
+                    <div class="warning-icon">
+                        <i class="fas fa-radiation-alt"></i>
+                    </div>
+                    <div class="warning-text">
+                        <h3>Warning: Permanent Deletion</h3>
+                        <p>You are about to permanently delete this stock item. This action will:</p>
+                        <ul class="warning-list">
+                            <li><i class="fas fa-times-circle"></i> Remove the item from all records</li>
+                            <li><i class="fas fa-times-circle"></i> Delete associated sales data</li>
+                            <li><i class="fas fa-times-circle"></i> Affect inventory calculations</li>
+                            <li><i class="fas fa-times-circle"></i> This action cannot be undone</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="confirmation-form">
+            <form method="POST" class="delete-form">
+                {% csrf_token %}
+                
+                <div class="form-header">
+                    <h3>Final Confirmation</h3>
+                    <p>Please confirm you want to proceed with deletion</p>
+                </div>
+
+                <div class="confirmation-actions">
+                    <button type="submit" class="btn-delete-confirm">
+                        <i class="fas fa-trash-alt"></i>
+                        Yes, Delete Permanently
+                    </button>
+                    
+                    <a href="{% url 'viewstock' stock.id %}" class="btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Cancel & Go Back
+                    </a>
+                </div>
+
+                <!-- Safety Check -->
+                <div class="safety-check">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="confirm-understand" class="confirm-checkbox">
+                        <label for="confirm-understand" class="checkbox-label">
+                            I understand this action is permanent and cannot be undone
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Alternative Actions -->
+        <div class="alternative-actions">
+            <h3>Alternative Actions</h3>
+            <p>Instead of deleting, consider these options:</p>
+            <div class="alternative-buttons">
+                <a href="{% url 'editstock' stock.id %}" class="btn-alternative edit">
+                    <i class="fas fa-edit"></i>
+                    Edit Stock Item
+                </a>
+                <a href="{% url 'viewstock' stock.id %}" class="btn-alternative view">
+                    <i class="fas fa-eye"></i>
+                    View Details
+                </a>
+                <a href="{% url 'allstock' %}" class="btn-alternative list">
+                    <i class="fas fa-boxes"></i>
+                    Back to Stock List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    .delete-confirmation-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fef7f7 0%, #feecec 100%);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Header Section */
+    .confirmation-header {
+        text-align: center;
+        margin-bottom: 30px;
+        max-width: 600px;
+    }
+
+    .header-icon {
+        font-size: 4rem;
+        color: #e74c3c;
+        margin-bottom: 15px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .confirmation-header h1 {
+        margin: 0 0 8px 0;
+        color: #c0392b;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        margin: 0;
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    /* Main Content */
+    .confirmation-content {
+        max-width: 800px;
+        width: 100%;
+    }
+
+    /* Warning Card */
+    .warning-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.15);
+        margin-bottom: 25px;
+        border: 2px solid #e74c3c;
+        overflow: hidden;
+    }
+
+    .warning-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 20px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .warning-header i {
+        font-size: 1.5rem;
+    }
+
+    .warning-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .warning-body {
+        padding: 25px;
+    }
+
+    /* Stock Summary */
+    .stock-summary {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #3498db;
+    }
+
+    .stock-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .info-item .label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .info-item .value {
+        font-size: 1rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    /* Deletion Warning */
+    .deletion-warning {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        background: #fdedec;
+        border: 1px solid #fadbd8;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .warning-icon {
+        font-size: 2rem;
+        color: #e74c3c;
+        flex-shrink: 0;
+    }
+
+    .warning-text h3 {
+        margin: 0 0 10px 0;
+        color: #c0392b;
+        font-size: 1.2rem;
+    }
+
+    .warning-text p {
+        margin: 0 0 15px 0;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .warning-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .warning-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 0;
+        color: #e74c3c;
+        font-size: 0.9rem;
+    }
+
+    .warning-list li i {
+        font-size: 0.8rem;
+    }
+
+    /* Confirmation Form */
+    .confirmation-form {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 2px solid #f1c40f;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .form-header h3 {
+        margin: 0 0 8px 0;
+        color: #2c3e50;
+        font-size: 1.3rem;
+    }
+
+    .form-header p {
+        margin: 0;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .confirmation-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn-delete-confirm, .btn-cancel {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .btn-delete-confirm {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-delete-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .btn-delete-confirm:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-cancel {
+        background: #95a5a6;
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    /* Safety Check */
+    .safety-check {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .confirm-checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #bdc3c7;
+        border-radius: 4px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .confirm-checkbox:checked {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+    }
+
+    .checkbox-label {
+        color: #2c3e50;
+        font-size: 0.95rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Alternative Actions */
+    .alternative-actions {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        text-align: center;
+    }
+
+    .alternative-actions h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 1.2rem;
+    }
+
+    .alternative-actions p {
+        margin: 0 0 20px 0;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .alternative-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-alternative {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .btn-alternative:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-alternative.edit:hover {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+    .btn-alternative.view:hover {
+        background: #2ecc71;
+        color: white;
+        border-color: #2ecc71;
+    }
+
+    .btn-alternative.list:hover {
+        background: #9b59b6;
+        color: white;
+        border-color: #9b59b6;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .delete-confirmation-container {
+            padding: 15px;
+        }
+
+        .confirmation-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+        }
+
+        .deletion-warning {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .confirmation-actions {
+            flex-direction: column;
+        }
+
+        .btn-delete-confirm, .btn-cancel {
+            min-width: auto;
+            width: 100%;
+        }
+
+        .alternative-buttons {
+            flex-direction: column;
+        }
+
+        .stock-info {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Animation for elements */
+    .warning-card, .confirmation-form, .alternative-actions {
+        animation: slideUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .confirmation-form {
+        animation-delay: 0.2s;
+    }
+
+    .alternative-actions {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButton = document.querySelector('.btn-delete-confirm');
+        const confirmCheckbox = document.getElementById('confirm-understand');
+        
+        // Disable delete button initially
+        deleteButton.disabled = true;
+        
+        // Enable delete button only when checkbox is checked
+        confirmCheckbox.addEventListener('change', function() {
+            deleteButton.disabled = !this.checked;
+        });
+        
+        // Add confirmation for delete action
+        deleteButton.addEventListener('click', function(e) {
+            if (!confirmCheckbox.checked) {
+                e.preventDefault();
+                alert('Please confirm that you understand this action is permanent.');
+                return;
+            }
+            
+            if (!confirm('FINAL WARNING: This will permanently delete "{{ stock.item_name }}". This action cannot be undone. Are you absolutely sure?')) {
+                e.preventDefault();
+                return;
+            }
+            
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+            this.disabled = true;
+        });
+        
+        // Add hover effect to warning icon
+        const warningIcon = document.querySelector('.warning-icon i');
+        warningIcon.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.2)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        warningIcon.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+</script>
+{% endblock %}
+

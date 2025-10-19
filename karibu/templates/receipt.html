@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Receipt #{{ sale.id }} {% endblock %}
+{% block content %}
+<div class="receipt-container">
+    <div class="receipt-header">
+        <h1 class="receipt-title">Karibu Grocery Store</h1>
+        <p class="receipt-subtitle">Sales Receipt</p>
+        <div class="receipt-meta">
+            <span>Receipt #{{ sale.id }}</span>
+            <span>{{ sale.sales_date|date:"F j, Y H:i" }}</span>
+        </div>
+    </div>
+
+    <div class="receipt-body ">
+        <div class="receipt-item">
+            <div class="item-row">
+                <span class="item-label">Product:</span>
+                <span class="item-value">{{ sale.product_name }}</span>
+            </div>
+            <div class="item-row">
+                <span class="item-label">Quantity:</span>
+                <span class="item-value">{{ sale.product_quantity }} bags</span>
+            </div>
+            <div class="item-row">
+                <span class="item-label">Unit Price:</span>
+                <span class="item-value">UGx {{ sale.unit_price }}</span>
+            </div>
+            <div class="item-row">
+                <span class="item-label">Payment Method:</span>
+                <span class="item-value">{{ sale.payment_method }}</span>
+            </div>
+        </div>
+
+        <div class="receipt-total">
+            <div class="total-row">
+                <span class="total-label">Total Amount:</span>
+                <span class="total-value">UGX {{ sale.amount_recieved }}</span>
+            </div>
+        </div>
+      
+    </div>
+    <ul>
+        {% for sale in sales %}
+          <li>
+            {{ sale.customer_name }} - {{ sale.product_name }} - {{ sale.get_sales }} - Received: {{ sale.amount_recieved }} - Balance: {{ sale.change_sales }}
+          </li>
+        {% endfor %}
+      </ul>
+    <div class="receipt-footer">
+        <p>Thank you for shopping with us!</p>
+        <p>For inquiries: contact@karibugrocery.com</p>
+    </div>
+
+    <div class="receipt-actions">
+        <button onclick="window.print()" class="print-btn">
+            <i class="fas fa-print"></i> Print Receipt
+        </button>
+        <a href="{% url 'saleslist' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Sales
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        padding: 20px;
+    }
+
+    /* Receipt Container */
+    .receipt-container {
+        max-width: 400px;
+        margin: 0 auto;
+        background: teal;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        padding: 25px;
+    }
+
+    /* Receipt Header */
+    .receipt-header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed #ddd;
+        margin-bottom: 20px;
+    }
+
+    .receipt-title {
+        color: greenyellow;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .receipt-subtitle {
+        color: gold;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .receipt-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: wheat;
+    }
+
+    /* Receipt Body */
+    .receipt-body {
+        margin-bottom: 20px;
+    }
+
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid black
+    }
+
+    .item-label {
+        font-weight: 600;
+        color: white;
+    }
+
+    .item-value {
+        color: white
+    }
+
+    /* Receipt Total */
+    .receipt-total {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid #2c3e50;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+    }
+
+    .total-label {
+        font-weight: 700;
+        color: greenyellow
+    }
+
+    .total-value {
+        font-weight: 700;
+        color: #7bd03f;
+    }
+
+    /* Receipt Footer */
+    .receipt-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px dashed #ddd;
+        color: greenyellow
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    .receipt-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        gap: 15px;
+    }
+
+    .print-btn, .back-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .print-btn {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .print-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .back-btn {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border: 1px solid #ddd;
+    }
+
+    .back-btn:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Print Styles */
+    @media print {
+        body {
+            background: none;
+            padding: 0;
+        }
+        
+        .receipt-container {
+            box-shadow: none;
+            max-width: 100%;
+            padding: 0;
+        }
+        
+        .receipt-actions {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .receipt-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<!-- Include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script>
+    // Add any JavaScript functionality if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        // You can add receipt-specific JS here if needed
+    });
+</script>
+{% endblock %}

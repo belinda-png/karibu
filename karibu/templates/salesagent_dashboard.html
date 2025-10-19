@@ -1,0 +1,979 @@
+{% extends 'base.html' %}
+{% block title %}Sales Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Navigation -->
+    <nav class="dashboard-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-chart-line"></i>
+                <span class="brand-text">SalesPro</span>
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'allstock' %}" class="nav-link">
+                    <i class="fas fa-boxes"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="{% url 'makesale' %}" class="nav-link active">
+                    <i class="fas fa-cash-register"></i>
+                    <span>New Sale</span>
+                </a>
+                <a href="{% url 'saleslist' %}" class="nav-link">
+                    <i class="fas fa-history"></i>
+                    <span>Sales History</span>
+                </a>
+                <a href="{% url 'manage_credits' %}" class="nav-link">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Credit Sales</span>
+                </a>
+            </div>
+            <div class="nav-user">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="username">Hi, {{ request.user.username }}</span>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}! 👋</h1>
+                <p>Here's what's happening with your sales today</p>
+            </div>
+            <div class="welcome-illustration">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="stats-grid">
+            <!-- Today's Sales Card -->
+            <div class="stat-card sales">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Today's Sales</h3>
+                    <div class="stat-value">UGX {{ today_sales|floatformat:2 }}</div>
+                    <div class="stat-comparison">
+                        <i class="fas fa-calendar-week"></i>
+                        UGX {{ weekly_sales|floatformat:2 }} this week
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Credits Card -->
+            <div class="stat-card credits">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Pending Credits</h3>
+                    <div class="stat-value">UGX {{ pending_credits|floatformat:2 }}</div>
+                    <a href="{% url 'manage_credits' %}" class="stat-link">
+                        View all credits <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="stat-card activity">
+                <div class="stat-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Recent Activity</h3>
+                    <div class="stat-value">{{ recent_sales.count }}</div>
+                    <div class="stat-label">sales in last 24h</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="stat-card actions">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{% url 'makesale' %}" class="action-btn primary">
+                            <i class="fas fa-cash-register"></i>
+                            New Sale
+                        </a>
+                        <a href="{% url 'allstock' %}" class="action-btn secondary">
+                            <i class="fas fa-boxes"></i>
+                            Inventory
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Recent Sales Section -->
+            <div class="content-card recent-sales">
+                <div class="card-header">
+                    <h3><i class="fas fa-receipt"></i> Recent Sales</h3>
+                    <a href="{% url 'saleslist' %}" class="view-all-link">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-content">
+                    {% if recent_sales %}
+                    <div class="sales-list">
+                        {% for sale in recent_sales %}
+                        <div class="sale-item">
+                            <div class="sale-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="sale-details">
+                                <div class="sale-title">
+                                    Sale #{{ sale.id }} - {{ sale.customer_name|default:"Anonymous" }}
+                                </div>
+                                <div class="sale-info">
+                                    {{ sale.product_quantity }} × {{ sale.product_name.item_name|default:"Item" }}
+                                </div>
+                            </div>
+                            <div class="sale-meta">
+                                <div class="sale-amount">UGX {{ sale.unit_price|floatformat:2 }}</div>
+                                <div class="sale-time">{{ sale.sales_date|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>No recent sales</p>
+                        <a href="{% url 'makesale' %}" class="empty-action">Make your first sale</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Access Section -->
+            <div class="content-card quick-access">
+                <div class="card-header">
+                    <h3><i class="fas fa-thunderbolt"></i> Quick Access</h3>
+                </div>
+                <div class="card-content">
+                    <div class="access-grid">
+                        <a href="{% url 'makesale' %}" class="access-item primary">
+                            <div class="access-icon">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                            <div class="access-content">
+                                <h4>New Sale</h4>
+                                <p>Record a new sale transaction</p>
+                            </div>
+                        </a>
+
+                        <a href="{% url 'allstock' %}" class="access-item secondary">
+                            <div class="access-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="access-content">
+                                <h4>Inventory</h4>
+                                <p>Manage stock and products</p>
+                            </div>
+                        </a>
+
+                        <a href="{% url 'saleslist' %}" class="access-item success">
+                            <div class="access-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="access-content">
+                                <h4>Sales History</h4>
+                                <p>View all sales records</p>
+                            </div>
+                        </a>
+
+                        <a href="{% url 'manage_credits' %}" class="access-item warning">
+                            <div class="access-icon">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <div class="access-content">
+                                <h4>Credit Sales</h4>
+                                <p>Manage pending credits</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Receipts Section -->
+            <div class="content-card recent-receipts">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-invoice"></i> Recent Receipts</h3>
+                </div>
+                <div class="card-content">
+                    {% if sales %}
+                    <div class="receipts-list">
+                        {% for sale in sales %}
+                        {% if sale.id %}
+                        <a href="{% url 'receipt' sale.id %}" class="receipt-item">
+                            <div class="receipt-icon">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="receipt-details">
+                                <div class="receipt-title">Receipt #{{ sale.id }}</div>
+                                <div class="receipt-customer">{{ sale.customer_name }}</div>
+                            </div>
+                            <div class="receipt-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-file-invoice"></i>
+                        <p>No receipts available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Credit Overview Section -->
+            <div class="content-card credit-overview">
+                <div class="card-header">
+                    <h3><i class="fas fa-credit-card"></i> Credit Overview</h3>
+                    <a href="{% url 'manage_credits' %}" class="view-all-link">
+                        Manage <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-content">
+                    <div class="credit-stats">
+                        <div class="credit-stat">
+                            <div class="stat-label">Pending Credits</div>
+                            <div class="stat-value">UGX {{ pending_credits|floatformat:2 }}</div>
+                        </div>
+                        <div class="credit-actions">
+                            <a href="{% url 'add_credit' %}" class="credit-btn">
+                                <i class="fas fa-plus"></i>
+                                Add Credit
+                            </a>
+                            <a href="{% url 'manage_credits' %}" class="credit-btn outline">
+                                <i class="fas fa-cog"></i>
+                                Manage
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Base Styles */
+    .dashboard-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+
+    /* Navigation */
+    .dashboard-nav {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .nav-brand i {
+        font-size: 1.8rem;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 8px;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-weight: 500;
+    }
+
+    .user-info i {
+        font-size: 1.5rem;
+    }
+
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Content */
+    .dashboard-main {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .welcome-content h1 {
+        margin: 0 0 8px 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+
+    .welcome-content p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .welcome-illustration i {
+        font-size: 4rem;
+        opacity: 0.8;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .stat-card.sales .stat-icon { background: linear-gradient(135deg, #10b981, #059669); }
+    .stat-card.credits .stat-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stat-card.activity .stat-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .stat-card.actions .stat-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+    .stat-content h3 {
+        margin: 0 0 8px 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .stat-comparison {
+        font-size: 0.85rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stat-link {
+        font-size: 0.85rem;
+        color: #3b82f6;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .stat-link:hover {
+        color: #2563eb;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-btn.primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .action-btn.primary:hover {
+        background: #2563eb;
+    }
+
+    .action-btn.secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .action-btn.secondary:hover {
+        background: #e5e7eb;
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 25px;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 25px 25px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .view-all-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .view-all-link:hover {
+        color: #2563eb;
+    }
+
+    .card-content {
+        padding: 0 25px 25px;
+    }
+
+    /* Recent Sales */
+    .sales-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .sale-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 10px;
+        transition: background 0.3s ease;
+    }
+
+    .sale-item:hover {
+        background: #f1f5f9;
+    }
+
+    .sale-icon {
+        width: 40px;
+        height: 40px;
+        background: #10b981;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .sale-details {
+        flex: 1;
+    }
+
+    .sale-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .sale-info {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .sale-meta {
+        text-align: right;
+    }
+
+    .sale-amount {
+        font-weight: 600;
+        color: #059669;
+        margin-bottom: 2px;
+    }
+
+    .sale-time {
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    /* Quick Access */
+    .access-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .access-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+    .access-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .access-item.primary { background: #eff6ff; border-color: #dbeafe; }
+    .access-item.secondary { background: #f8fafc; border-color: #f1f5f9; }
+    .access-item.success { background: #f0fdf4; border-color: #dcfce7; }
+    .access-item.warning { background: #fffbeb; border-color: #fef3c7; }
+
+    .access-item.primary:hover { background: #dbeafe; }
+    .access-item.secondary:hover { background: #f1f5f9; }
+    .access-item.success:hover { background: #dcfce7; }
+    .access-item.warning:hover { background: #fef3c7; }
+
+    .access-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: white;
+    }
+
+    .access-item.primary .access-icon { background: #3b82f6; }
+    .access-item.secondary .access-icon { background: #6b7280; }
+    .access-item.success .access-icon { background: #10b981; }
+    .access-item.warning .access-icon { background: #f59e0b; }
+
+    .access-content h4 {
+        margin: 0 0 4px 0;
+        color: #1f2937;
+        font-size: 1rem;
+    }
+
+    .access-content p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+
+    /* Recent Receipts */
+    .receipts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .receipt-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .receipt-item:hover {
+        background: #f1f5f9;
+        transform: translateX(5px);
+    }
+
+    .receipt-icon {
+        width: 40px;
+        height: 40px;
+        background: #8b5cf6;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .receipt-details {
+        flex: 1;
+    }
+
+    .receipt-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 2px;
+    }
+
+    .receipt-customer {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .receipt-arrow {
+        color: #9ca3af;
+        transition: color 0.3s ease;
+    }
+
+    .receipt-item:hover .receipt-arrow {
+        color: #3b82f6;
+    }
+
+    /* Credit Overview */
+    .credit-stats {
+        text-align: center;
+    }
+
+    .credit-stat {
+        margin-bottom: 20px;
+    }
+
+    .credit-stat .stat-label {
+        font-size: 1rem;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .credit-stat .stat-value {
+        font-size: 2.5rem;
+        color: #f59e0b;
+    }
+
+    .credit-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .credit-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .credit-btn {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .credit-btn:hover {
+        background: #d97706;
+    }
+
+    .credit-btn.outline {
+        background: transparent;
+        border: 2px solid #f59e0b;
+        color: #f59e0b;
+    }
+
+    .credit-btn.outline:hover {
+        background: #f59e0b;
+        color: white;
+    }
+
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .empty-state p {
+        margin: 0 0 15px 0;
+        font-size: 1rem;
+    }
+
+    .empty-action {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .empty-action:hover {
+        color: #2563eb;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .nav-links {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-main {
+            padding: 20px 15px;
+        }
+
+        .welcome-banner {
+            padding: 30px 25px;
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .welcome-content h1 {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .access-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .credit-actions {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .nav-container {
+            padding: 0 15px;
+        }
+
+        .nav-user .username {
+            display: none;
+        }
+
+        .welcome-banner {
+            padding: 25px 20px;
+        }
+
+        .welcome-content h1 {
+            font-size: 1.5rem;
+        }
+
+        .card-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .sale-item {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .sale-meta {
+            text-align: center;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add loading animations
+        const cards = document.querySelectorAll('.stat-card, .content-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Update real-time data (placeholder for actual implementation)
+        function updateRealTimeData() {
+            // This would be replaced with actual API calls
+            console.log('Updating dashboard data...');
+        }
+
+        // Update every 30 seconds
+        setInterval(updateRealTimeData, 30000);
+
+        // Add interactive elements
+        const quickActions = document.querySelectorAll('.access-item');
+        quickActions.forEach(action => {
+            action.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px)';
+            });
+            
+            action.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Custom Sales Report</h2>
+
+<form method="GET" class="mb-6">
+    <label>Start Date:
+        <input type="date" name="start_date" class="border p-1 rounded">
+    </label>
+    <label>End Date:
+        <input type="date" name="end_date" class="border p-1 rounded">
+    </label>
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Filter
+    </button>
+</form>
+
+{% if sales %}
+<table class="table-auto w-full border">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.product_name }}</td>
+            <td>{{ sale.product_quantity }}</td>
+            <td>{{ sale.amount_received }}</td>
+            <td>{{ sale.sales_date|date:"Y-m-d" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p class="mt-4 font-semibold">Total Sales: {{ total_amount }}</p>
+{% else %}
+<p>No sales in selected range.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-5 sm:px-3 lg:px-5">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+      <div class="text-center">
+        <!-- Warning icon -->
+        <div class="mx-auto flex items-center justify-center h-8 w-8 rounded-full bg-red-100 mb-2 ">
+          <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Confirm Deletion</h2>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete <span class="font-semibold">{{ item.product_name }}</span>?</p>
+        
+        <form method="POST" class="space-y-2">
+          {% csrf_token %}
+          <div class="flex justify-center space-x-1">
+            <!-- Cancel button -->
+             {% if user.is_manager%}
+            <a href="{% url 'buying_list' %}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Cancel
+            </a>
+            {% endif %}
+            <!-- Delete button -->
+            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+              Yes, Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

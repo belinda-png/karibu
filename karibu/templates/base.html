@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="Description" content="Enter your description here"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/static/css/style.css">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<title>{% block title %}Default Title{% endblock %}</title>
+<!-- Common CSS links -->
+</head>
+<body>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; /* Ensure no default margin */
+    }
+  
+    .container {
+      background-color: #90c295; /* Background color for the container */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      flex: 1; /* Allow the container to grow and push the footer down */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-bottom: 60px; /* Ensure content doesn't overlap with the footer */
+    }
+  
+    /* Table Header Styling */
+    .table thead th {
+      background-color: #138d75;
+      color: white;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 1rem;
+      padding: 15px;
+    }
+  
+    /* Table Body Styling */
+    .table tbody td {
+      vertical-align: middle;
+      text-align: center;
+      padding: 12px;
+      font-size: 0.95rem;
+      color: #333;
+      background-color: #ffffff; /* Ensuring all cells have uniform white background */
+    }
+  
+    /* Row Hover Effect */
+    .table-hover tbody tr:hover {
+      background-color: #e9f5ff;
+    }
+  
+    /* View Detail Button Styling */
+    .view-detail-btn {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: background-color 0.3s ease;
+    }
+  
+    .view-detail-btn:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+      color: white;
+    }
+  
+    /* General Button Styling */
+    .btn-success {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: background-color 0.3s ease;
+    }
+  
+    .btn-success:hover {
+      background-color: #28a745;
+    }
+  
+    /* Table Borders */
+    .table-bordered th,
+    .table-bordered td {
+      border: 1px solid #dee2e6 !important;
+      padding: 12px;
+    }
+  
+    h1 {
+      color: #2c3e50;
+      font-weight: bold;
+    }
+  
+    .table th {
+      background-color: #8cc996;
+      color: #2c3e50;
+    }
+  
+    .btn-danger {
+      border-radius: 20px;
+    }
+  
+    .text-end {
+      text-align: right;
+      margin-bottom: 15px; /* Adds space between the button and the table */
+    }
+  
+    .btn-primary {
+      float: right; /* This will place the button to the right */
+      margin-right: 0; /* Ensures there's no space between the button and the edge */
+    }
+  
+    .btn-green {
+      background-color: #16a085;
+      border-color: #16a085;
+      color: white;
+    }
+  
+    .btn-green:hover {
+      background-color: #138d75;
+      border-color: #138d75;
+      color: white;
+    }
+  
+    html, body {
+      height: 100%;
+      margin: 0; /* Ensure no default margin */
+    }
+  
+    /* Footer Styling */
+    footer {
+      margin-top: auto;
+      width: 100%;
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+  
+    {% block extra_css %}{% endblock %}
+    <div class="branch-indicator">
+      {% if request.session.current_branch %}
+      <span class="badge bg-info">
+          <i class="fas fa-store-alt me-2"></i>
+          Current Branch: {{ request.session.current_branch_name }}
+      </span>
+      {% endif %}
+  </div>
+</head>
+<body>
+    <header>
+        <!-- Navigation/header content -->
+       
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Content from child templates will be inserted here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- Footer content -->
+        <p>&copy; 2025 Welcome to Karibu Groceries✨</p>
+    </footer>
+    {% block extra_js %}{% endblock %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+</body>
+</html>

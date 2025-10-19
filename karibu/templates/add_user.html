@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Add New User{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-6 text-center">Add New User</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="space-y-4 bg-teal text-green">
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            {% if user.is_owner %}
+            <a href="{% url 'user_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+                Cancel
+            </a>
+            {% endif %}
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Create User
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

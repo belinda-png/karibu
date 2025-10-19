@@ -1,0 +1,669 @@
+{% extends "base.html" %}
+{% block title %}Edit Stock - {{ stock.name }}{% endblock %}
+
+{% block content %}
+<div class="edit-stock-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-edit"></i>
+                <h1>Edit Stock Item</h1>
+            </div>
+            <div class="breadcrumb">
+                <a href="{% url 'allstock' %}">Stock Management</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'viewstock' stock.id %}">{{ stock.name|default:"Stock Item" }}</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Edit</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-content">
+        <div class="form-card">
+            <!-- Stock Summary -->
+            <div class="stock-summary">
+                <div class="summary-header">
+                    <h3><i class="fas fa-box"></i> Current Stock Details</h3>
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">Item Name:</span>
+                        <span class="value">{{ stock.name|default:"N/A" }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Current Quantity:</span>
+                        <span class="value">{{ stock.quantity|default:"0" }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Category:</span>
+                        <span class="value">{{ stock.category|default:"N/A" }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Last Updated:</span>
+                        <span class="value">{{ stock.updated_at|date:"M j, Y H:i"|default:"N/A" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <form method="POST" class="stock-form">
+                {% csrf_token %}
+                
+                <div class="form-header">
+                    <h2><i class="fas fa-pencil-alt"></i> Update Stock Information</h2>
+                    <p class="form-description">Modify the details below to update this stock item</p>
+                </div>
+
+                <div class="form-grid">
+                    {% for field in form %}
+                    <div class="form-field {% if field.errors %}error{% endif %}">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+                        
+                        <div class="field-wrapper">
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle"></i>
+                                {{ field.help_text }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if field.errors %}
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                            <span class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ error }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <div class="primary-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            Update Stock
+                        </button>
+                        <button type="reset" class="btn-secondary">
+                            <i class="fas fa-undo"></i>
+                            Reset Changes
+                        </button>
+                    </div>
+                    
+                    <div class="secondary-actions">
+                        <a href="{% url 'viewstock' stock.id %}" class="btn-outline">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                        <a href="{% url 'allstock' %}" class="btn-text">
+                            <i class="fas fa-list"></i>
+                            Back to All Stock
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            <div class="actions-grid">
+                <a href="{% url 'viewstock' stock.id %}" class="action-card">
+                    <div class="action-icon view">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="action-content">
+                        <h4>View Details</h4>
+                        <p>View current stock information</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'allstock' %}" class="action-card">
+                    <div class="action-icon list">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="action-content">
+                        <h4>All Stock</h4>
+                        <p>Browse all stock items</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'addstock' %}" class="action-card">
+                    <div class="action-icon add">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-content">
+                        <h4>Add New</h4>
+                        <p>Add new stock item</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    .edit-stock-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Header Styles */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 25px 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #3498db;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title i {
+        font-size: 2.2rem;
+        color: #3498db;
+    }
+
+    .header-title h1 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+    .breadcrumb i {
+        font-size: 0.7rem;
+        opacity: 0.6;
+    }
+
+    /* Form Content */
+    .form-content {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    /* Stock Summary */
+    .stock-summary {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px 30px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .summary-header h3 {
+        margin: 0 0 20px 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+    }
+
+    .summary-header i {
+        color: #3498db;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .summary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .summary-item .label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .summary-item .value {
+        font-size: 1rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    /* Form Styles */
+    .stock-form {
+        padding: 30px;
+    }
+
+    .form-header {
+        margin-bottom: 30px;
+    }
+
+    .form-header h2 {
+        margin: 0 0 8px 0;
+        color: #2c3e50;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header i {
+        color: #3498db;
+    }
+
+    .form-description {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-field label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .required {
+        color: #e74c3c;
+        margin-left: 2px;
+    }
+
+    .field-wrapper {
+        position: relative;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        font-family: inherit;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .help-text i {
+        color: #3498db;
+    }
+
+    /* Error States */
+    .form-field.error input,
+    .form-field.error select,
+    .form-field.error textarea {
+        border-color: #e74c3c;
+    }
+
+    .error-messages {
+        margin-top: 5px;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 25px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .primary-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .secondary-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-outline,
+    .btn-text {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #6c757d;
+        border: 2px solid #6c757d;
+    }
+
+    .btn-outline:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-text {
+        background: transparent;
+        color: #3498db;
+        border: 2px solid transparent;
+    }
+
+    .btn-text:hover {
+        background: #f8f9fa;
+        border-color: #3498db;
+        transform: translateY(-2px);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        background: white;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .quick-actions h3 {
+        margin: 0 0 20px 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+    }
+
+    .quick-actions i {
+        color: #f39c12;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+    .action-card:hover {
+        background: white;
+        border-color: #3498db;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .action-icon.view {
+        background: #3498db;
+    }
+
+    .action-icon.list {
+        background: #2ecc71;
+    }
+
+    .action-icon.add {
+        background: #e74c3c;
+    }
+
+    .action-content h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+
+    .action-content p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .edit-stock-container {
+            padding: 15px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch;
+        }
+
+        .primary-actions,
+        .secondary-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-outline,
+        .btn-text {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Animation for form fields */
+    .form-field {
+        animation: slideUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Stagger animation for form fields */
+    .form-field:nth-child(1) { animation-delay: 0.1s; }
+    .form-field:nth-child(2) { animation-delay: 0.2s; }
+    .form-field:nth-child(3) { animation-delay: 0.3s; }
+    .form-field:nth-child(4) { animation-delay: 0.4s; }
+    .form-field:nth-child(5) { animation-delay: 0.5s; }
+    .form-field:nth-child(6) { animation-delay: 0.6s; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add focus effects to form fields
+        const formFields = document.querySelectorAll('input, select, textarea');
+        
+        formFields.forEach(field => {
+            field.addEventListener('focus', function() {
+                this.parentElement.parentElement.classList.add('focused');
+            });
+            
+            field.addEventListener('blur', function() {
+                this.parentElement.parentElement.classList.remove('focused');
+            });
+        });
+
+        // Form submission enhancement
+        const form = document.querySelector('.stock-form');
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            submitBtn.disabled = true;
+        });
+
+        // Reset form confirmation
+        const resetBtn = document.querySelector('button[type="reset"]');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to reset all changes?')) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Auto-focus first field with error
+        const firstErrorField = document.querySelector('.form-field.error input, .form-field.error select, .form-field.error textarea');
+        if (firstErrorField) {
+            firstErrorField.focus();
+        }
+    });
+</script>
+{% endblock %}

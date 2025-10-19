@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Sales Records</h2>
+    
+
+    <table class="bg-green-200t-sm bg-teal-100">
+        <thead class="bg-info">
+            <tr>
+               
+                <th class="px-4 py-2 text-left ">Product</th>
+                <th class="px-4 py-2 text-left">Quantity</th>
+                <th class="px-4 py-2 text-left">Unit Price</th>
+                <th class="px-4 py-2 text-left">Amount Received</th>
+                <th class="px-4 py-2 text-left">Customer</th>
+                <th class="px-4 py-2 text-left">Payment Method</th>
+                <th class="px-4 py-2 text-left">Date</th>
+                <th class="px-4 py-2 text-left">Action </th>
+               
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for sale in sales %}
+            <tr>
+               
+                <td class="px-4 py-1">{{ sale.product_name }}</td>
+                <td class="px-4 py-1">{{ sale.product_quantity }}</td>
+                <td class="px-4 py-1">UGX {{ sale.unit_price }}</td>
+                <td class="px-4 py-1">UGX {{ sale.amount_received }}</td>
+                <td class="px-4 py-1">{{ sale.customer_name }}</td>
+                <td class="px-4 py-1">{{ sale.payment_method }}</td>
+                <td class="px-4 py-1">{{ sale.sales_date|date:"M d, Y H:i" }}</td>
+                <td>
+                    <div class="flex flex-col md:flex-row gap-2 mt-2">
+                        {% if user.is_manager or is_salesagent %}
+                        <!-- Sell Item Button -->
+                        <a href="{% url 'makesale' %}" class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-sm shadow hover:bg-blue-700 transition duration-300 text-base font-small">
+                          
+                            Sell Item
+                        </a>
+                        {% endif %}
+                    
+                        <!-- Check Records Button -->
+                        <a href="{% url 'sales_records' %}" class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition duration-300 text-base font-medium">
+                            
+                            Check Records
+                        </a>
+                    </div>
+                    
+                    
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-4 py-1 text-center text-gray-500">No sales recorded yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

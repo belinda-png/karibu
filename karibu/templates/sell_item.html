@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="sales-form-container">
+    <div class="form-header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-cash-register"></i>
+                <h1>Record New Sale</h1>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'saleslist' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Sales
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-content">
+        <!-- Debug Info -->
+        {% if form.instance.id %}
+        <div class="debug-info">
+            <i class="fas fa-info-circle"></i>
+            <span>Current Sale ID: <strong>{{ form.instance.id }}</strong></span>
+        </div>
+        {% endif %}
+
+        <div class="form-card">
+            <div class="card-header">
+                <h2><i class="fas fa-shopping-cart"></i> Sale Information</h2>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Active Form</span>
+                </div>
+            </div>
+
+            <form method="POST" class="sales-form">
+                {% csrf_token %}
+                
+                <!-- Form Fields -->
+                <div class="form-grid">
+                    {% for field in form %}
+                    <div class="form-field {% if field.errors %}error{% endif %}">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+                        <div class="field-wrapper">
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle"></i>
+                                {{ field.help_text }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if field.errors %}
+                        <div class="error-messages">
+                            {% for error in field.errors %}
+                            <span class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ error }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    {% if user.is_manager or user.is_salesagent %}
+                    <div class="primary-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            Record Sale
+                        </button>
+                        
+                        {% if form.instance.id %}
+                        <a href="{% url 'receipt' sale_id=form.instance.id %}" class="btn-secondary">
+                            <i class="fas fa-receipt"></i>
+                            Generate Receipt
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="secondary-actions">
+                        <a href="{% url 'saleslist' %}" class="btn-outline">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="quick-tips">
+            <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Ensure all required fields are filled</span>
+                </div>
+                <div class="tip-item">
+                    <i class="fas fa-box"></i>
+                    <span>Verify stock availability before selling</span>
+                </div>
+                <div class="tip-item">
+                    <i class="fas fa-user-check"></i>
+                    <span>Double-check customer information</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    .sales-form-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Header Styles */
+    .form-header {
+        background: white;
+        border-radius: 12px;
+        padding: 20px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #3498db;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title i {
+        font-size: 2rem;
+        color: #3498db;
+    }
+
+    .header-title h1 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #f8f9fa;
+        color: #6c757d;
+        text-decoration: none;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .back-btn:hover {
+        background: #e9ecef;
+        color: #495057;
+        transform: translateY(-1px);
+    }
+
+    /* Form Content */
+    .form-content {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .debug-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid #3498db;
+    }
+
+    .debug-info i {
+        color: #3498db;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #2ecc71;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    /* Form Styles */
+    .sales-form {
+        padding: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-field label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .required {
+        color: #e74c3c;
+        margin-left: 2px;
+    }
+
+    .field-wrapper {
+        position: relative;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .help-text i {
+        color: #3498db;
+    }
+
+    /* Error States */
+    .form-field.error input,
+    .form-field.error select,
+    .form-field.error textarea {
+        border-color: #e74c3c;
+    }
+
+    .error-messages {
+        margin-top: 5px;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 25px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .primary-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .secondary-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-outline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #6c757d;
+        border: 2px solid #6c757d;
+    }
+
+    .btn-outline:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Quick Tips */
+    .quick-tips {
+        background: white;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .quick-tips h3 {
+        margin: 0 0 20px 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.2rem;
+    }
+
+    .quick-tips h3 i {
+        color: #f39c12;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #f39c12;
+    }
+
+    .tip-item i {
+        color: #2ecc71;
+        font-size: 1.1rem;
+    }
+
+    .tip-item span {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .sales-form-container {
+            padding: 15px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch;
+        }
+
+        .primary-actions,
+        .secondary-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-outline {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Animation for form fields */
+    .form-field {
+        animation: slideUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Stagger animation for form fields */
+    .form-field:nth-child(1) { animation-delay: 0.1s; }
+    .form-field:nth-child(2) { animation-delay: 0.2s; }
+    .form-field:nth-child(3) { animation-delay: 0.3s; }
+    .form-field:nth-child(4) { animation-delay: 0.4s; }
+    .form-field:nth-child(5) { animation-delay: 0.5s; }
+    .form-field:nth-child(6) { animation-delay: 0.6s; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add focus effects to form fields
+        const formFields = document.querySelectorAll('input, select, textarea');
+        
+        formFields.forEach(field => {
+            field.addEventListener('focus', function() {
+                this.parentElement.parentElement.classList.add('focused');
+            });
+            
+            field.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.parentElement.parentElement.classList.remove('focused');
+                }
+            });
+        });
+
+        // Form submission enhancement
+        const form = document.querySelector('.sales-form');
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+        });
+
+        // Auto-format currency fields if any
+        const currencyFields = document.querySelectorAll('input[type="number"]');
+        currencyFields.forEach(field => {
+            field.addEventListener('blur', function() {
+                if (this.value) {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

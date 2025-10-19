@@ -1,0 +1,31 @@
+
+{% extends 'base.html' %}
+{% block title %}Deactivate User{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-6 text-center">Deactivate User</h2>
+    
+    <div class="mb-6">
+        <p class="text-gray-700">Are you sure you want to deactivate the user <span class="font-semibold">{{ user.username }}</span>?</p>
+        <p class="text-sm text-gray-500 mt-2">This will prevent the user from logging in, but their account data will be preserved.</p>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mt-6 flex justify-between">
+            {% if user.is_owner%}
+            <a href="{% url 'user_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+                Cancel
+            </a>
+            {% endif %}
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Deactivate User
+            </button>
+           
+        </div>
+    </form>
+</div>
+{% endblock %}
+```

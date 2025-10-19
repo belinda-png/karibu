@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Delete Credit</h2>
+    <p>Are you sure you want to delete credit for {{ credit.customer_name }}?</p>
+    
+    <form method="post" action="{% url 'delete_credit' credit.id %}">
+        {% csrf_token %}
+        {% if user.is_manager%}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'manage_credits' %}" class="btn btn-secondary">Cancel</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,724 @@
+{% extends "base.html" %}
+{% block title %}{{ stock.item_name }} - Stock Details{% endblock %}
+
+{% block content %}
+<div class="stock-detail-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-box"></i>
+                <div class="title-content">
+                    <h1>{{ stock.item_name }}</h1>
+                    <p class="stock-category">{{ stock.category_name }}</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'allstock' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Stock List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                {% if user.is_manager or is_salesagent %}
+                <a href="{% url 'makesale' %}" class="btn-primary">
+                    <i class="fas fa-cash-register"></i>
+                    Make Sale
+                </a>
+                {% endif %}
+                
+                {% if user.is_manager %}
+                <div class="manager-actions">
+                    <a href="{% url 'editstock' stock.id %}" class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Edit Stock
+                    </a>
+                    <a href="{% url 'deletestock' stock.id %}" class="btn-delete" 
+                       onclick="return confirm('Are you sure you want to delete this stock item? This action cannot be undone.');">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Stock
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Stock Information Cards -->
+            <div class="stock-info-grid">
+                <!-- Basic Information Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Basic Information</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-item">
+                            <span class="label">Category</span>
+                            <span class="value">{{ stock.category_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Item Name</span>
+                            <span class="value">{{ stock.item_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Type of Stock</span>
+                            <span class="value">{{ stock.type_of_stock }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Supplier</span>
+                            <span class="value">{{ stock.supplier_name }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quantity Information Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-cubes"></i>
+                        <h3>Quantity Information</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-item">
+                            <span class="label">Current Quantity</span>
+                            <span class="value highlight">{{ stock.product_quantity }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Issued Quantity</span>
+                            <span class="value">{{ stock.issued_quantity }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Total Quantity</span>
+                            <span class="value">{{ stock.total_quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Information Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Financial Information</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-item">
+                            <span class="label">Unit Price</span>
+                            <span class="value price">UGX {{ stock.unit_price }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Cost</span>
+                            <span class="value cost">UGX {{ stock.cost }}</span>
+                        </div>
+                        {% if stock.unit_price and stock.cost %}
+                        <div class="info-item">
+                            <span class="label">Profit Margin</span>
+                            <span class="value profit">
+                                UGX {{ stock.unit_price|add:"-"|add:stock.cost }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timeline Information Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i>
+                        <h3>Timeline</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-item">
+                            <span class="label">Date Added</span>
+                            <span class="value">{{ stock.date_added|date:"M j, Y" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Last Updated</span>
+                            <span class="value">{{ stock.last_updated|date:"M j, Y H:i" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Status</span>
+                            <span class="value status {% if stock.product_quantity > 10 %}in-stock{% elif stock.product_quantity > 0 %}low-stock{% else %}out-of-stock{% endif %}">
+                                {% if stock.product_quantity > 10 %}
+                                    In Stock
+                                {% elif stock.product_quantity > 0 %}
+                                    Low Stock
+                                {% else %}
+                                    Out of Stock
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Status Indicator -->
+            <div class="status-indicator">
+                <div class="status-header">
+                    <h3><i class="fas fa-chart-bar"></i> Stock Status</h3>
+                </div>
+                <div class="status-content">
+                    <div class="stock-level">
+                        <div class="level-bar">
+                            <div class="level-fill {% if stock.product_quantity > 10 %}high{% elif stock.product_quantity > 0 %}medium{% else %}low{% endif %}"
+                                 style="width: {% widthratio stock.product_quantity stock.total_quantity 100 %}%">
+                            </div>
+                        </div>
+                        <div class="level-info">
+                            <span>{{ stock.product_quantity }} / {{ stock.total_quantity }} units available</span>
+                            <span class="percentage">{% widthratio stock.product_quantity stock.total_quantity 100 %}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="sidebar-actions">
+                    <a href="{% url 'allstock' %}" class="sidebar-btn">
+                        <i class="fas fa-boxes"></i>
+                        View All Stock
+                    </a>
+                    {% if user.is_manager %}
+                    <a href="{% url 'addstock' %}" class="sidebar-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        Add New Stock
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'makesale' %}" class="sidebar-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        Make New Sale
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stock Summary -->
+            <div class="sidebar-card">
+                <h3><i class="fas fa-chart-pie"></i> Stock Summary</h3>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Current Value</span>
+                        <span class="stat-value">
+                            UGX {% widthratio stock.unit_price 1 stock.product_quantity %}
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Invested</span>
+                        <span class="stat-value">UGX {{ stock.cost }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Potential Revenue</span>
+                        <span class="stat-value">
+                            UGX {% widthratio stock.unit_price 1 stock.product_quantity %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    .stock-detail-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Header Styles */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 25px 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #3498db;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header-title i {
+        font-size: 2.5rem;
+        color: #3498db;
+    }
+
+    .title-content h1 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stock-category {
+        margin: 5px 0 0 0;
+        color: #6c757d;
+        font-size: 1rem;
+        background: #e3f2fd;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .back-btn:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    /* Content Layout */
+    .content-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 25px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-edit, .btn-delete {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+    }
+
+    .manager-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    /* Stock Information Grid */
+    .stock-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .label {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .value {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .value.highlight {
+        color: #2ecc71;
+        font-size: 1.1rem;
+    }
+
+    .value.price {
+        color: #27ae60;
+    }
+
+    .value.cost {
+        color: #e74c3c;
+    }
+
+    .value.profit {
+        color: #f39c12;
+    }
+
+    .value.status.in-stock {
+        color: #27ae60;
+        background: #d5f4e6;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .value.status.low-stock {
+        color: #f39c12;
+        background: #fdebd0;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .value.status.out-of-stock {
+        color: #e74c3c;
+        background: #fadbd8;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    /* Status Indicator */
+    .status-indicator {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .status-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .status-header h3 {
+        margin: 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+
+    .status-content {
+        padding: 25px;
+    }
+
+    .stock-level {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .level-bar {
+        height: 12px;
+        background: #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .level-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.5s ease;
+    }
+
+    .level-fill.high {
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+    }
+
+    .level-fill.medium {
+        background: linear-gradient(90deg, #f39c12, #e67e22);
+    }
+
+    .level-fill.low {
+        background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+
+    .level-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .percentage {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sidebar-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+    }
+
+    .sidebar-card h3 {
+        margin: 0 0 15px 0;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+
+    .sidebar-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sidebar-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-btn:hover {
+        background: #3498db;
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .summary-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .stat-value {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .content-wrapper {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            order: -1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stock-detail-container {
+            padding: 15px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .header-title {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .header-title i {
+            font-size: 2rem;
+        }
+
+        .title-content h1 {
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .manager-actions {
+            flex-direction: column;
+        }
+
+        .stock-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-primary, .btn-edit, .btn-delete {
+            justify-content: center;
+            width: 100%;
+        }
+    }
+
+    /* Animations */
+    .info-card {
+        animation: slideUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .info-card:nth-child(1) { animation-delay: 0.1s; }
+    .info-card:nth-child(2) { animation-delay: 0.2s; }
+    .info-card:nth-child(3) { animation-delay: 0.3s; }
+    .info-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add loading state to buttons
+        const buttons = document.querySelectorAll('.btn-primary, .btn-edit, .btn-delete');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!this.href || this.getAttribute('type') === 'submit') {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    this.disabled = true;
+                    
+                    // Revert after 3 seconds if still on page
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 3000);
+                }
+            });
+        });
+
+        // Animate the stock level bar
+        const levelFill = document.querySelector('.level-fill');
+        if (levelFill) {
+            // Get computed width and reset to 0 for animation
+            const finalWidth = levelFill.style.width;
+            levelFill.style.width = '0%';
+            
+            // Animate to final width
+            setTimeout(() => {
+                levelFill.style.transition = 'width 1.5s ease-in-out';
+                levelFill.style.width = finalWidth;
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

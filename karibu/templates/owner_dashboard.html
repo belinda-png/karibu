@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard{% endblock %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<div class="min-h-screen bg-slate-100">
+    <!-- Navigation -->
+    <div class="header-content">
+        <h1><i class="fas fa-user-shield"></i> Owner</h1>
+        <div class="user-info">
+            <span class="welcome-msg">Welcome, {{ request.user.username }}</span>
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="branch-indicator">
+        <div class="alert alert-info">
+            <i class="fas fa-store"></i>
+            Currently logged into: <strong>{{ request.session.branch_name }}</strong> 
+            ({{ request.session.branch_location }})
+        </div>
+    </div>
+
+    <div class="dashboard-header">
+        <h2>Here's what's happening with your sales today.</h2>
+        <div class="branch-badge">
+            <span class="badge bg-primary">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ request.session.branch_name }} Branch
+            </span>
+        </div>
+    </div>
+</header>
+
+<nav class="bg-blue-800 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center">
+                <span class="text-xl font-bold">BusinessPro</span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="{% url 'home' %}" class="text-blue-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">Home</a>
+                    <a href="{% url 'allstock' %}" class="text-blue-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">Inventory</a>
+                    <a href="{% url 'saleslist' %}" class="text-blue-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">Sales</a>
+                    <a href="{% url 'manage_credits' %}" class="text-blue-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">Credits</a>
+
+                    {% for credit in credits %}
+                    <a href="{% url 'view_credit' credit.pk %}" class="block bg-white text-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">{{ credit.customer_name }}</h3>
+                                    <p class="text-sm text-gray-500 mt-1">{{ credit.product_name }}</p>
+                                </div>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                                          {% if credit.status == 'Paid' %}bg-green-100 text-green-800
+                                          {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                    {{ credit.status }}
+                                </span>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Amount Due</p>
+                                    <p class="text-xl font-bold text-gray-900">UGX {{ credit.due_amount|floatformat:0 }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Due Date</p>
+                                    <p class="font-medium text-gray-900">{{ credit.due_date|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-sm text-gray-500">ID: {{ credit.pk }}</span>
+                            <span class="text-blue-600 text-sm font-medium flex items-center">
+                                View Details <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="ml-4 flex items-center md:ml-6">
+                <span class="text-sm font-medium mr-4 text-white">Owner: {{ request.user.username }}</span>
+                <a href="{% url 'logout' %}" class="text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded text-sm">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Owner Dashboard</h1>
+                <p class="text-gray-600">Full system access and business overview</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <span class="inline-flex items-center px-4 py-2 bg-blue-100 border border-blue-300 rounded-md font-semibold text-blue-800">
+                    <i class="fas fa-crown mr-2"></i> Owner Privileges
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total Stock -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                    <i class="fas fa-box-open fa-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Total Stock</h3>
+                    <p class="text-2xl font-bold">{{ total_stock }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Sales -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                    <i class="fas fa-chart-line fa-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Today's Sales</h3>
+                    <p class="text-2xl font-bold">UGX {{ todays_sales|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Credits -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                    <i class="fas fa-hand-holding-usd fa-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Pending Credits</h3>
+                    <p class="text-2xl font-bold">UGX {{ pending_credits|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                    <i class="fas fa-exclamation-triangle fa-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Low Stock</h3>
+                    <p class="text-2xl font-bold">{{ low_stock_items }} Items</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Recent Sales</h3>
+            <a href="{% url 'saleslist' %}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+        </div>
+
+        <div class="space-y-4">
+            {% for sale in recent_sales %}
+            <div class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
+                <div>
+                    <p class="font-medium">#{{ sale.id }} - {{ sale.customer_name|default:"Anonymous" }}</p>
+                    <p class="text-sm text-gray-500">{{ sale.product_name }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold">UGX {{ sale.unit_price|floatformat:0 }}</p>
+                    <p class="text-sm text-gray-500">{{ sale.sales_date|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-gray-500">No recent sales</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+</div>
+
+{% endblock %}
+
