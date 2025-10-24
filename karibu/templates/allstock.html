@@ -21,9 +21,6 @@
         <table class="min-w-full divide-y divide-gray-200 bg-white">
             <thead class="bg-green-100">
                 <tr>
-                    <th class="px-4 py-3 text-left text-sm font-semibold text-green-800">Image</th>
-
-                    <th class="px-4 py-3 text-left text-sm font-semibold text-green-800">Image</th>
                     <th class="px-4 py-3 text-left text-sm font-semibold text-green-800">Stock Category</th>
                     <th class="px-4 py-3 text-left text-sm font-semibold text-green-800">Product Name</th>
                     <th class="px-4 py-3 text-left text-sm font-semibold text-green-800">Quantity</th>
@@ -35,13 +32,6 @@
             <tbody class="divide-y divide-gray-100">
                 {% for stock in stocks %}
                 <tr class="hover:bg-green-50 transition duration-200">
-                    <td class="px-4 py-3 text-sm text-gray-700">
-                        {% if stock.image %}
-                            <img src="{{ stock.image.url }}" alt="{{ stock.item_name }}" class="w-16 h-16 object-cover rounded-md shadow-sm">
-                        {% else %}
-                            <img src="{% static 'images/default.png' %}" alt="No image" class="w-16 h-16 object-cover rounded-md opacity-50">
-                        {% endif %}
-                    </td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ stock.category_name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700 font-semibold">{{ stock.item_name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ stock.product_quantity }}</td>
