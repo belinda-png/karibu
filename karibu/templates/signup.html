@@ -7,116 +7,81 @@
     --primary-green: #6EE7B7;
     --accent-pink: #f472b6;
     --background-light: #D9FBE9;
-    --form-bg: #F8FAF9;
     --text-dark: #000;
     --error-color: #e74c3c;
 }
 
-/* General container */
+/* Full-page background */
 .auth-container {
     min-height: 100vh;
     display: flex;
+    justify-content: center;
     align-items: center;
-    justify-content: center;
-    background: var(--background-light);
-}
-
-.auth-wrapper {
-    display: flex;
-    width: 100%;
-    max-width: 1200px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Left panel with image and overlay */
-.auth-welcome {
-    flex: 1;
-    position: relative;
     background: url("{% static 'images/mama.jpeg' %}") no-repeat center center/cover;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 3rem;
+    position: relative;
 }
 
-.auth-welcome::after {
+/* Transparent overlay for better text visibility */
+.auth-container::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5); /* Dark overlay layer */
+    background: rgba(0,0,0,0.45);
 }
 
-.auth-welcome-content {
+/* Signup form wrapper */
+.auth-form-container {
     position: relative;
     z-index: 2;
-}
-
-.auth-welcome h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--primary-green);
-    margin-bottom: 1rem;
-}
-
-.auth-welcome p {
-    font-size: 1rem;
-    color: #e5e5e5;
-    margin-bottom: 0.5rem;
-}
-
-.auth-welcome .tagline {
-    font-style: italic;
-    color: var(--accent-pink);
-    font-weight: 500;
-}
-
-/* Right panel (form) */
-.auth-form-container {
-    flex: 1;
-    background: var(--form-bg);
-    padding: 3rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.auth-form-card {
-    max-width: 400px;
-    margin: 0 auto;
     width: 100%;
+    height: 100%;
+    inset: 0;
+    /* Transparent card */
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    z-index: 2;
+    backdrop-filter: blur(1px); /* Glass effect */
+}
+
+/* Center text */
+.auth-form-card {
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 0.5rem;
 }
 
 .auth-form-card h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--text-dark);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
 }
 
+/* Form fields */
 .form-group {
     margin-bottom: 1.2rem;
+    text-align: left;
 }
 
 .form-group label {
     display: block;
     font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 0.4rem;
+    color: #f2f2f2;
+    margin-bottom: 0.3rem;
 }
 
 .form-control {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    border: 1px solid #ccc;
-    color: var(--text-dark);
-    font-size: 0.95rem;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    color: white;
 }
 
 .form-control:focus {
@@ -125,22 +90,32 @@
     box-shadow: 0 0 0 2px rgba(110, 231, 183, 0.4);
 }
 
-/* Add error styling for form fields */
-.form-control.error-field {
-    border-color: var(--error-color);
-    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+/* Errors */
+.error {
+    color: #ffb3b3;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
 }
 
+.non-field-errors {
+    background-color: rgba(255, 0, 0, 0.15);
+    border: 1px solid #ff6666;
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+/* Button */
 .btn-primary {
     background-color: var(--primary-green);
-    color: var(--text-dark);
+    color: black;
     border: none;
     padding: 12px;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 700;
     width: 100%;
-    transition: all 0.3s ease;
-    margin-top: 0.5rem;
+    transition: all 0.2s;
 }
 
 .btn-primary:hover {
@@ -148,173 +123,103 @@
     transform: translateY(-2px);
 }
 
-.error {
-    color: var(--error-color);
-    font-size: 0.9rem;
-    margin-top: 0.3rem;
-}
-
-/* Non-field errors (general form errors) */
-.non-field-errors {
-    background-color: #fee;
-    border: 1px solid var(--error-color);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 1.5rem;
-    color: var(--error-color);
-}
-
+/* Login link */
 .login-link {
-    margin-top: 1.2rem;
-    text-align: center;
-    color: var(--text-dark);
+    margin-top: 1rem;
+    color: white;
 }
 
 .login-link a {
     color: var(--primary-green);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.login-link a:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 992px) {
-    .auth-wrapper {
-        flex-direction: column;
-    }
-    .auth-welcome {
-        padding: 2rem;
-        text-align: center;
-        min-height: 300px;
-    }
-    .auth-form-container {
-        padding: 2rem;
-    }
+    font-weight: bold;
 }
 </style>
 
 <div class="auth-container">
-    <div class="auth-wrapper">
-        <!-- Left panel -->
-        <div class="auth-welcome">
-            <div class="auth-welcome-content">
-                <h1>Welcome to Karibu Groceries Limited</h1>
-                <p>Your workspace awaits—log in to continue. Track sales, manage inventory, and oversee operations all from your dashboard.</p>
-                <p class="tagline">Freshness Delivered to Your Doorstep!</p>
-            </div>
-        </div>
 
-        <!-- Right panel -->
-        <div class="auth-form-container">
-            <div class="auth-form-card">
-                <h2>📝 Create an account</h2>
-                
-                <!-- Display general form errors -->
-                {% if form.non_field_errors %}
-                    <div class="non-field-errors">
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
+    <div class="auth-form-container">
 
-                <form method="post">
-                    {% csrf_token %}
+        <div class="auth-form-card">
+            <h2>📝 Create an Account</h2>
 
-                    <div class="form-group">
-                        {{ form.username.label_tag }}
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <div class="error">{{ form.username.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.email.label_tag }}
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                            <div class="error">{{ form.email.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label>I am a:</label>
-                        {% for choice in form.user_type %}
-                            <div class="radio-choice">
-                                {{ choice.tag }}
-                                <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.branch.label_tag }}
-                        {{ form.branch }}
-                        {% if form.branch.errors %}
-                            <div class="error">{{ form.branch.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.role.label_tag }}
-                        {{ form.role }}
-                        {% if form.role.errors %}
-                            <div class="error">{{ form.role.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.password1.label_tag }}
-                        {{ form.password1 }}
-                        {% if form.password1.errors %}
-                            <div class="error">{{ form.password1.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.password2.label_tag }}
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}
-                            <div class="error">{{ form.password2.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                          <button type="submit" class="btn-primary">Sign Up</button>
-                </form>
-
-                <div class="login-link">
-                    Already have an account? <a href="{% url 'login' %}">Log in</a>
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="error">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="error">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>I am a:</label>
+                    {% for choice in form.user_type %}
+                        <div class="radio-choice">
+                            {{ choice.tag }}
+                            <label style="color:white" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.branch.label_tag }}
+                    {{ form.branch }}
+                    {% if form.branch.errors %}
+                        <div class="error">{{ form.branch.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.role.label_tag }}
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <div class="error">{{ form.role.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password1.label_tag }}
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="error">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password2.label_tag }}
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="error">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="{% url 'login' %}">Log in</a>
             </div>
+
         </div>
     </div>
 </div>
-
-<!-- Add JavaScript to preserve form data on error -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    
-    // Check if there are any errors on the page
-    const hasErrors = document.querySelector('.error') || document.querySelector('.non-field-errors');
-    
-    if (hasErrors) {
-        console.log('Form has errors - data should be preserved by Django');
-    }
-    
-    // Optional: Add real-time validation
-    const fields = document.querySelectorAll('.form-control');
-    fields.forEach(field => {
-        field.addEventListener('blur', function() {
-            if (this.value.trim() === '') {
-                this.classList.add('error-field');
-            } else {
-                this.classList.remove('error-field');
-            }
-        });
-    });
-});
-</script>
 
 {% endblock %}

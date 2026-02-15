@@ -40,11 +40,11 @@ INSTALLED_APPS = [
 
     # Third-party apps
     "crispy_forms",
-    "crispy_bootstrap4",
+    "crispy_bootstrap5",
 ]
 
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 
 # --------------------------------------------------
