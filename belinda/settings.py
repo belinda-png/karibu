@@ -6,6 +6,8 @@ Production-ready configuration for Render deployment.
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
+load_dotenv()
 
 # --------------------------------------------------
 # BASE DIRECTORY
@@ -18,9 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # --------------------------------------------------
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
-
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-for-local")
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
 
