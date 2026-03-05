@@ -79,6 +79,24 @@ class UserCreationForm(UserCreationForm):
         model = User_profile
         fields = ("username", "email", "password1", "password2", "user_type", "branch")
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user_type = cleaned_data.get("user_type")
+        branches = cleaned_data.get("branch")
+        
+        # Validate that managers and sales agents must select at least one branch
+        if user_type in ["manager", "salesagent"] and not branches:
+            raise forms.ValidationError(
+                f"{user_type.title()}s must select at least one branch."
+            )
+        
+        # Owners should not have any branches selected (they get access to all)
+        if user_type == "owner" and branches:
+            # Clear branches for owners - they get access to all branches automatically
+            cleaned_data["branch"] = None
+        
+        return cleaned_data
+
     def save(self, commit=True):
         user = super().save(commit=False)
 
@@ -86,6 +104,7 @@ class UserCreationForm(UserCreationForm):
         user_type = self.cleaned_data["user_type"]
         if user_type == "owner":
             user.is_owner = True
+            # Owners don't need specific branches - they get access to all
         elif user_type == "manager":
             user.is_manager = True
         elif user_type == "salesagent":
@@ -93,8 +112,13 @@ class UserCreationForm(UserCreationForm):
 
         if commit:
             user.save()
-            # Save branches
-            user.branches.set(self.cleaned_data["branch"])
+            # Only save branches if not an owner
+            if user_type != "owner":
+                user.branches.set(self.cleaned_data["branch"])
+            else:
+                # For owners, we can optionally assign all branches or leave empty
+                # since they have system-wide access
+                pass
 
         return user
 

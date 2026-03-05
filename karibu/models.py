@@ -57,12 +57,15 @@ class Stock(models.Model):
         Category, on_delete=models.SET_NULL, blank=True, null=True
     )
     item_name = models.CharField(max_length=100, blank=True, null=True)
+    sku = models.CharField(max_length=50, unique=True, blank=True, null=True)  # Added SKU field
     product_quantity = models.IntegerField(default=0, blank=True, null=True)
     cost = models.IntegerField(default=0, blank=True, null=True)
     issued_quantity = models.CharField(max_length=100, null=True, blank=True)
     total_quantity = models.CharField(max_length=100, null=True, blank=True)
     type_of_stock = models.CharField(max_length=100, blank=True, null=True)
     supplier_name = models.CharField(max_length=15, blank=True, null=True)
+    unit_of_measure = models.CharField(max_length=20, default="kg", blank=True, null=True)  # KG, units, liters, etc.
+    low_stock_threshold = models.IntegerField(default=10, blank=True, null=True)  # Custom threshold per item
     date_added = models.DateTimeField(default=timezone.now)
     last_updated = models.DateTimeField(default=timezone.now)
 
@@ -71,6 +74,39 @@ class Stock(models.Model):
 
     def __str__(self):
         return self.item_name if self.item_name else "Unnamed Stock"
+    
+    def get_stock_status(self):
+        """Return stock status based on quantity and custom threshold"""
+        threshold = self.low_stock_threshold or 10  # Default to 10 if not set
+        if self.product_quantity == 0:
+            return "Out of Stock"
+        elif self.product_quantity < threshold:
+            return "Low Stock"
+        else:
+            return "In Stock"
+    
+    def get_status_color(self):
+        """Return Bootstrap color class based on stock status"""
+        status = self.get_stock_status()
+        if status == "Out of Stock":
+            return "danger"
+        elif status == "Low Stock":
+            return "warning"
+        else:
+            return "success"
+    
+    def get_quantity_with_unit(self):
+        """Return quantity with unit of measure (e.g., '50 kg', '10 units')"""
+        unit = self.unit_of_measure or "units"
+        return f"{self.product_quantity} {unit}" if self.product_quantity else f"0 {unit}"
+    
+    def get_low_stock_warning(self):
+        """Return low stock warning message with threshold"""
+        threshold = self.low_stock_threshold or 10
+        unit = self.unit_of_measure or "units"
+        if self.product_quantity < threshold and self.product_quantity > 0:
+            return f"Low stock: Only {self.product_quantity} {unit} left (threshold: {threshold} {unit})"
+        return ""
 
 
 # ===============================

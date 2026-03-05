@@ -133,7 +133,57 @@
     color: var(--primary-green);
     font-weight: bold;
 }
+
+/* Radio button styling */
+.radio-choice {
+    margin-bottom: 0.5rem;
+}
+
+.radio-choice input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+/* Hide branch group initially for owner */
+#branch-group {
+    transition: all 0.3s ease;
+}
+
+#branch-group.hidden {
+    display: none;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const user_type_radios = document.querySelectorAll('input[name="user_type"]');
+    const branch_group = document.getElementById('branch-group');
+    
+    function toggleBranchSelection() {
+        const selected_user_type = document.querySelector('input[name="user_type"]:checked').value;
+        
+        if (selected_user_type === 'owner') {
+            // Hide branch selection for owners
+            branch_group.classList.add('hidden');
+            // Clear any selected branches for owners
+            const branch_checkboxes = branch_group.querySelectorAll('input[type="checkbox"]');
+            branch_checkboxes.forEach(checkbox => checkbox.checked = false);
+        } else {
+            // Show branch selection for managers and sales agents
+            branch_group.classList.remove('hidden');
+        }
+    }
+    
+    // Add event listeners to all radio buttons
+    user_type_radios.forEach(radio => {
+        radio.addEventListener('change', toggleBranchSelection);
+    });
+    
+    // Initial check on page load
+    if (document.querySelector('input[name="user_type"]:checked')) {
+        toggleBranchSelection();
+    }
+});
+</script>
 
 <div class="auth-container">
 
@@ -169,6 +219,17 @@
                     {% endif %}
                 </div>
 
+                <div class="form-group" id="branch-group">
+                    {{ form.branch.label_tag }}
+                    {{ form.branch }}
+                    {% if form.branch.errors %}
+                        <div class="error">{{ form.branch.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted" style="color: #ccc; font-size: 0.8rem;">
+                        Select the branches this user will have access to. Owners have access to all branches.
+                    </small>
+                </div>
+
                 <div class="form-group">
                     <label>I am a:</label>
                     {% for choice in form.user_type %}
@@ -177,22 +238,11 @@
                             <label style="color:white" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                         </div>
                     {% endfor %}
-                </div>
-
-                <div class="form-group">
-                    {{ form.branch.label_tag }}
-                    {{ form.branch }}
-                    {% if form.branch.errors %}
-                        <div class="error">{{ form.branch.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    {{ form.role.label_tag }}
-                    {{ form.role }}
-                    {% if form.role.errors %}
-                        <div class="error">{{ form.role.errors }}</div>
-                    {% endif %}
+                    <small class="form-text text-muted" style="color: #ccc; font-size: 0.8rem;">
+                        Owner: Full access to all branches<br>
+                        Manager: Access to selected branches<br>
+                        Sales Agent: Access to selected branches only
+                    </small>
                 </div>
 
                 <div class="form-group">

@@ -46,6 +46,9 @@ urlpatterns = [
     path("manager/", views.manager_dashboard, name="manager_dashboard"),
     path("salesagent/", views.salesagent_dashboard, name="salesagent_dashboard"),
 
+    # Inventory Management
+    path("inventory/", views.inventory_management, name="inventory_management"),
+
     # Stock
     path("allstock/", views.allstock, name="allstock"),
     path("addstock/", views.addstock, name="addstock"),

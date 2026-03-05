@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from datetime import datetime
 from django.contrib.auth.forms import UserCreationForm
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.decorators import (
     login_required,
     permission_required,
     user_passes_test,
 )
+from django.core.paginator import Paginator
 
 # Create your views here.
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
@@ -55,15 +56,19 @@ def home(request):
 
 def allstock(request):
     if request.user.is_authenticated:
-        # Check if the user has any associated branches
-        user_branches = request.user.branches.all()
-
-        if user_branches.exists():
-            # Filter stocks based on the user's branches
-            stocks = Stock.objects.filter(branch__in=user_branches)
+        # Owners can see all branches, others see only their assigned branches
+        if request.user.is_owner:
+            stocks = Stock.objects.all()
         else:
-            # If no branches are associated, return an empty queryset or handle accordingly
-            stocks = Stock.objects.none()
+            # Check if the user has any associated branches
+            user_branches = request.user.branches.all()
+
+            if user_branches.exists():
+                # Filter stocks based on the user's branches
+                stocks = Stock.objects.filter(branch__in=user_branches)
+            else:
+                # If no branches are associated, return an empty queryset or handle accordingly
+                stocks = Stock.objects.none()
     else:
         # Handle the case where the user is not authenticated
         stocks = Stock.objects.none()
@@ -169,17 +174,21 @@ def branch_sales(request, branch_name):
 
 def saleslist(request):
     if request.user.is_authenticated:
-        # Check if the user has any associated branches
-        user_branches = request.user.branches.all()
-
-        if user_branches.exists():
-            # Filter sales based on the user's branches
-            sales = Sale.objects.filter(branch__in=user_branches).order_by(
-                "-sales_date"
-            )
+        # Owners can see all branches, others see only their assigned branches
+        if request.user.is_owner:
+            sales = Sale.objects.all().order_by("-sales_date")
         else:
-            # If no branches are associated, return an empty queryset or handle accordingly
-            sales = Sale.objects.none()
+            # Check if the user has any associated branches
+            user_branches = request.user.branches.all()
+
+            if user_branches.exists():
+                # Filter sales based on the user's branches
+                sales = Sale.objects.filter(branch__in=user_branches).order_by(
+                    "-sales_date"
+                )
+            else:
+                # If no branches are associated, return an empty queryset or handle accordingly
+                sales = Sale.objects.none()
     else:
         # Handle the case where the user is not authenticated
         sales = Sale.objects.none()
@@ -308,75 +317,108 @@ def owner_dashboard(request):
     if not request.user.is_authenticated:
         return redirect("login")
 
-    # Get current branch
-    branch_id = request.session.get("branch_id")
-
-    # If no branch is selected, handle that case
-    if not branch_id:
-        # Try to get user's first branch
-        if request.user.branches.exists():
-            branch_id = request.user.branches.first().id
-            request.session["branch_id"] = branch_id
-        else:
-            # Handle case where user has no branches
-            messages.error(request, "No branch selected or available")
-            return redirect("home")  # Redirect to an appropriate page
-
     # Today's date
     today = timezone.now().date()
-
-    # 1. TOTAL STOCK CALCULATION
-    stock = Stock.objects.filter(branch_id=branch_id).count()
-
-    # 2. AVERAGE COST CALCULATION
-    avg_cost_data = Stock.objects.filter(branch_id=branch_id).aggregate(avg=Avg("cost"))
-    average = int(avg_cost_data["avg"] or 0)  # Convert to integer to avoid decimals
-
-    # 3. TOTAL SALES AMOUNT CALCULATION
-    # Calculate using get_sales method from Sale model
-    sales = Sale.objects.filter(branch_id=branch_id)
-    amount = 0
-    for sale in sales:
-        amount += sale.get_sales()
-
-    # Keep your original calculations for additional metrics
-
-    # TODAY'S SALES CALCULATION (in UGX)
-    todays_sales_data = Sale.objects.filter(branch_id=branch_id, sales_date__date=today)
-    todays_sales = 0
-    for sale in todays_sales_data:
-        todays_sales += sale.get_sales()
-
-    # PENDING CREDITS CALCULATION (in UGX)
-    pending_credits = (
-        Credit.objects.filter(branch_id=branch_id, status="Pending").aggregate(
-            total_credits=Sum("due_amount")
-        )["total_credits"]
-        or 0
-    )
-
-    # LOW STOCK ITEMS
-    low_stock_items = Stock.objects.filter(
-        branch_id=branch_id, product_quantity__lt=10  # Threshold for low stock
-    ).count()
+    
+    # Get all branches for the system admin
+    all_branches = Branch.objects.all()
+    
+    # 1. TOTAL PRODUCTS across all branches
+    total_products = Stock.objects.count()
+    
+    # 2. LOW STOCK ALERTS across all branches (items with quantity < 10)
+    low_stock_items = Stock.objects.filter(product_quantity__lt=10)
+    low_stock_alerts = low_stock_items.count()
+    
+    # 3. SALES TODAY across all branches
+    todays_sales = Sale.objects.filter(sales_date__date=today)
+    sales_today_count = todays_sales.count()
+    
+    # 4. REVENUE TODAY across all branches
+    revenue_today = 0
+    for sale in todays_sales:
+        revenue_today += sale.get_sales()
+    
+    # Branch Overview Data
+    branch_overview = []
+    for branch in all_branches:
+        # Products count for this branch
+        branch_products = Stock.objects.filter(branch=branch).count()
+        
+        # Staff count for this branch (users with access to this branch)
+        branch_staff = User_profile.objects.filter(branches=branch).count()
+        
+        # Daily revenue for this branch
+        branch_todays_sales = Sale.objects.filter(branch=branch, sales_date__date=today)
+        branch_daily_revenue = 0
+        for sale in branch_todays_sales:
+            branch_daily_revenue += sale.get_sales()
+        
+        # Low stock items for this branch
+        branch_low_stock = Stock.objects.filter(branch=branch, product_quantity__lt=10)
+        
+        branch_overview.append({
+            'name': branch.name,
+            'products': branch_products,
+            'staff': branch_staff,
+            'daily_revenue': branch_daily_revenue,
+            'low_stock_items': branch_low_stock
+        })
+    
+    # Recent Activity (last 10 activities across all branches)
+    recent_sales = Sale.objects.select_related('product_name', 'branch').order_by('-sales_date')[:5]
+    recent_stock = Stock.objects.select_related('branch').order_by('-date_added')[:5]
+    
+    # Combine recent activities
+    recent_activity = []
+    
+    # Add recent sales
+    for sale in recent_sales:
+        recent_activity.append({
+            'type': 'sale',
+            'description': f"Sale of {sale.product_name.item_name if sale.product_name else 'Unknown Product'}",
+            'details': f"Customer: {sale.customer_name or 'Anonymous'}",
+            'amount': f"UGX {sale.get_sales():,}",
+            'time': sale.sales_date,
+            'branch': sale.branch.name if sale.branch else 'Unknown'
+        })
+    
+    # Add recent stock additions
+    for stock in recent_stock:
+        recent_activity.append({
+            'type': 'stock',
+            'description': f"Stock added: {stock.item_name}",
+            'details': f"Quantity: {stock.product_quantity}",
+            'amount': f"Cost: UGX {stock.cost:,}" if stock.cost else "No cost",
+            'time': stock.date_added,
+            'branch': stock.branch.name if stock.branch else 'Unknown'
+        })
+    
+    # Sort by time (most recent first)
+    recent_activity.sort(key=lambda x: x['time'], reverse=True)
+    recent_activity = recent_activity[:10]  # Limit to 10 most recent
 
     context = {
-        # Variables that match your template
-        "stock": stock,
-        "average": average,
-        "amount": amount,
-        # Keep your original variables for other parts of the template
-        "total_stock": stock,  # For backward compatibility
-        "todays_sales": todays_sales,
-        "pending_credits": pending_credits,
-        "low_stock_items": low_stock_items,
-        # For the recent activity section
-        "recent_sales": Sale.objects.filter(branch_id=branch_id).order_by(
-            "-sales_date"
-        )[:5],
-        "recent_stock": Stock.objects.filter(branch_id=branch_id).order_by(
-            "-date_added"
-        )[:3],
+        # Main Metrics
+        'total_products': total_products,
+        'low_stock_alerts': low_stock_alerts,
+        'sales_today': sales_today_count,
+        'revenue_today': revenue_today,
+        
+        # Branch Overview
+        'branch_overview': branch_overview,
+        
+        # Low Stock Items for alerts section
+        'low_stock_items_list': low_stock_items.order_by('product_quantity')[:10],  # Show 10 most critical
+        
+        # Recent Activity
+        'recent_activity': recent_activity,
+        
+        # For backward compatibility
+        'total_stock': total_products,
+        'todays_sales': revenue_today,
+        'pending_credits': Credit.objects.filter(status="Pending").aggregate(total=Sum("due_amount"))["total"] or 0,
+        'low_stock_items': low_stock_alerts,
     }
 
     return render(request, "owner_dashboard.html", context)
@@ -668,3 +710,70 @@ def deactivate_user(request, user_id):
         messages.success(request, f"User {user.username} deactivated successfully!")
         return redirect("user_list")
     return render(request, "confirm_deactivate.html", {"user": user})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_owner)
+def inventory_management(request):
+    """
+    System Admin Inventory Management Page
+    Shows all products across all branches with filtering and search capabilities
+    """
+    # Get query parameters
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    branch_filter = request.GET.get('branch', '')
+    status_filter = request.GET.get('status', '')
+
+    # Start with all stock items
+    stocks = Stock.objects.select_related('branch', 'category_name').all()
+
+    # Apply search filter
+    if search_query:
+        stocks = stocks.filter(
+            Q(item_name__icontains=search_query) |
+            Q(sku__icontains=search_query)
+        )
+
+    # Apply category filter
+    if category_filter:
+        stocks = stocks.filter(category_name__category_name=category_filter)
+
+    # Apply branch filter
+    if branch_filter:
+        stocks = stocks.filter(branch__name=branch_filter)
+
+    # Apply status filter
+    if status_filter:
+        if status_filter == 'In Stock':
+            stocks = stocks.filter(product_quantity__gte=10)
+        elif status_filter == 'Low Stock':
+            stocks = stocks.filter(product_quantity__lt=10, product_quantity__gt=0)
+        elif status_filter == 'Out of Stock':
+            stocks = stocks.filter(product_quantity=0)
+
+    # Order by last_updated
+    stocks = stocks.order_by('-last_updated')
+
+    # Pagination
+    paginator = Paginator(stocks, 15)  # Show 15 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Get filter options
+    categories = Category.objects.values_list('category_name', flat=True).distinct()
+    branches = Branch.objects.values_list('name', flat=True).distinct()
+
+    context = {
+        'page_obj': page_obj,
+        'stocks': page_obj,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'branch_filter': branch_filter,
+        'status_filter': status_filter,
+        'categories': categories,
+        'branches': branches,
+        'status_choices': ['In Stock', 'Low Stock', 'Out of Stock'],
+    }
+
+    return render(request, 'inventory_management.html', context)
