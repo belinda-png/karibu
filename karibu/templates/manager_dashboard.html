@@ -57,14 +57,22 @@
                 </div>
                 
                 <div class="nav-section">
-                    <h4>Credit Management</h4>
-                    <a href="{% url 'manage_credits' %}" class="nav-item">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <span>Manage Credits</span>
+                    <h4>User Management</h4>
+                    <a href="{% url 'user_list' %}" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>View Users</span>
                     </a>
-                    <a href="{% url 'add_credit' %}" class="nav-item">
+                    <a href="{% url 'add_user' %}" class="nav-item">
                         <i class="fas fa-user-plus"></i>
-                        <span>Add Credit</span>
+                        <span>Add User</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Navigation</h4>
+                    <a href="{% url 'home' %}" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Back to Home</span>
                     </a>
                 </div>
             </nav>

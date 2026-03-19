@@ -18,14 +18,47 @@
     </div>
 
     <div class="form-content">
-        <!-- Debug Info -->
-        {% if form.instance.id %}
-        <div class="debug-info">
-            <i class="fas fa-info-circle"></i>
-            <span>Current Sale ID: <strong>{{ form.instance.id }}</strong></span>
+        <!-- Product Gallery Section -->
+        {% if products %}
+        <div class="products-gallery">
+            <div class="gallery-header">
+                <h2><i class="fas fa-images"></i> Select a Product to Sell</h2>
+                <p>Click on a product to view details and add to sale</p>
+            </div>
+            <div class="gallery-grid">
+                {% for product in products %}
+                    <div class="gallery-card" onclick="selectProduct({{ product.id }}, '{{ product.item_name }}', {{ product.cost }})">
+                        <div class="gallery-image {% if not product.image %}no-image{% endif %}">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.item_name }}">
+                            {% else %}
+                                <i class="fas fa-box"></i>
+                            {% endif %}
+                        </div>
+                        <div class="gallery-info">
+                            <h3>{{ product.item_name }}</h3>
+                            <p class="category">
+                                {% if product.category_name %}
+                                    {{ product.category_name.category_name }}
+                                {% else %}
+                                    Groceries
+                                {% endif %}
+                            </p>
+                            <p class="price">UGX {{ product.cost|default:"N/A" }}</p>
+                            <p class="quantity">
+                                <i class="fas fa-weight"></i> {{ product.get_quantity_with_unit }}
+                            </p>
+                            <span class="status {% if product.product_quantity == 0 %}out-of-stock{% elif product.product_quantity < 10 %}low-stock{% else %}in-stock{% endif %}">
+                                {{ product.get_stock_status }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
+        <!-- Form Card -->
         <div class="form-card">
             <div class="card-header">
                 <h2><i class="fas fa-shopping-cart"></i> Sale Information</h2>
@@ -103,7 +136,7 @@
             <div class="tips-grid">
                 <div class="tip-item">
                     <i class="fas fa-check-circle"></i>
-                    <span>Ensure all required fields are filled</span>
+                    <span>Click on a product card to quickly select it</span>
                 </div>
                 <div class="tip-item">
                     <i class="fas fa-box"></i>
@@ -183,24 +216,140 @@
 
     /* Form Content */
     .form-content {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
     }
 
-    .debug-info {
-        background: #d1ecf1;
-        color: #0c5460;
-        padding: 12px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+    /* Products Gallery */
+    .products-gallery {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .gallery-header {
+        margin-bottom: 25px;
+    }
+
+    .gallery-header h2 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 10px;
-        border-left: 4px solid #3498db;
     }
 
-    .debug-info i {
+    .gallery-header h2 i {
         color: #3498db;
+    }
+
+    .gallery-header p {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .gallery-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .gallery-card:hover {
+        transform: translateY(-8px);
+        border-color: #3498db;
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
+    }
+
+    .gallery-image {
+        width: 100%;
+        height: 150px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        overflow: hidden;
+    }
+
+    .gallery-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gallery-image.no-image {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .gallery-info {
+        padding: 15px;
+    }
+
+    .gallery-info h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gallery-info .category {
+        color: #7f8c8d;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+
+    .gallery-info .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2ecc71;
+        margin-bottom: 5px;
+    }
+
+    .gallery-info .quantity {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+
+    .gallery-info .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .gallery-info .status.in-stock {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .gallery-info .status.low-stock {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .gallery-info .status.out-of-stock {
+        background: #f8d7da;
+        color: #721c24;
     }
 
     /* Form Card */
@@ -467,6 +616,10 @@
             font-size: 1.5rem;
         }
 
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
         .form-grid {
             grid-template-columns: 1fr;
             gap: 20px;
@@ -520,6 +673,18 @@
 </style>
 
 <script>
+    function selectProduct(productId, productName, price) {
+        // Set the product_name field to the selected product
+        const productSelect = document.querySelector('select[name="product_name"]');
+        if (productSelect) {
+            productSelect.value = productId;
+            productSelect.dispatchEvent(new Event('change'));
+            
+            // Scroll to form
+            document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // Add focus effects to form fields
         const formFields = document.querySelectorAll('input, select, textarea');
@@ -538,11 +703,13 @@
 
         // Form submission enhancement
         const form = document.querySelector('.sales-form');
-        form.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            submitBtn.disabled = true;
-        });
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                submitBtn.disabled = true;
+            });
+        }
 
         // Auto-format currency fields if any
         const currencyFields = document.querySelectorAll('input[type="number"]');
@@ -556,4 +723,3 @@
     });
 </script>
 {% endblock %}
-

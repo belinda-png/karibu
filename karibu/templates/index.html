@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshHarvest | Premium Cereals & Groceries</title>
-
+    <title>Karibu Groceries | Premium Cereals & Products</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -22,20 +21,16 @@
             --dark: #333;
             --gray: #777;
             --white: #fff;
-            --shadow: none; /* removed shadows to keep transparency clean */
         }
 
         body {
             line-height: 1.6;
-            color: var(--white); /* text white because background is dark */
-            background: 
-                linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                url('static/images/image2.jpeg');
+            color: var(--dark);
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('static/images/image2.jpeg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
             background-attachment: fixed;
-            min-height: 100vh; 
+            min-height: 100vh;
         }
 
         .container {
@@ -46,40 +41,148 @@
 
         /* Header */
         header {
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.98);
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
         }
 
         /* Hero Section */
         .hero {
-            background: transparent;
-            color: var(--white);
+            color: white;
             padding: 100px 50px;
             text-align: center;
             display: flex;
-            min-height: 70vh;
+            min-height: 60vh;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             max-width: 700px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
-        /* Features Section */
-        .features {
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Products Section */
+        .products-section {
             padding: 80px 0;
-            background-color: rgba(255, 255, 255, 0); /* fully transparent */
+            background: white;
         }
 
         .section-title {
@@ -88,14 +191,147 @@
         }
 
         .section-title h2 {
-            font-size: 2.2rem;
-            color: var(--white);
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 10px;
         }
 
         .section-title p {
-            color: #ddd;
-            max-width: 600px;
-            margin: 0 auto;
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image.no-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .product-quantity {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .product-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-light);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: #f9f9f9;
         }
 
         .features-grid {
@@ -104,15 +340,13 @@
             gap: 30px;
         }
 
-        /* Transparent Feature Cards */
         .feature-card {
             text-align: center;
-            padding: 30px 20px;
-            border-radius: 8px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s;
-            background-color: transparent; /* Fully transparent */
-            box-shadow: none;              /* No shadow */
-            border: none;                  /* No border */
         }
 
         .feature-card:hover {
@@ -120,60 +354,44 @@
         }
 
         .feature-icon {
-            font-size: 2.8rem;
-            color: #ffeb3b;
+            font-size: 3rem;
+            color: var(--primary);
             margin-bottom: 20px;
         }
 
         .feature-card h3 {
-            color: var(--white);
+            color: var(--dark);
             margin-bottom: 10px;
+            font-size: 1.2rem;
         }
 
         .feature-card p {
-            color: #dddddd;
+            color: var(--gray);
         }
 
         /* CTA Section */
         .cta-section {
             padding: 80px 0;
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--white);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
             text-align: center;
         }
 
         .cta-section h2 {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             margin-bottom: 20px;
         }
 
         .cta-section p {
             max-width: 600px;
             margin: 0 auto 30px;
-        }
-
-        /* Login Button Fixed */
-        .cta-button {
-            background-color: #0d3b66;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-            display: inline-block;
-        }
-
-        .cta-button:hover {
-            background-color: #0b3153;
+            font-size: 1.1rem;
         }
 
         /* Footer */
         footer {
-            background-color: rgba(0, 0, 0, 0.7);
-            color: var(--white);
+            background-color: #2c3e50;
+            color: white;
             padding: 60px 0 20px;
         }
 
@@ -181,78 +399,226 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 40px;
+            margin-bottom: 40px;
         }
 
         .footer-column h3 {
-            margin-bottom: 15px;
-            color: var(--white);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
         }
 
-        .footer-column p {
-            color: #ccc;
+        .footer-column ul {
+            list-style: none;
         }
 
-        .copyright {
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
             text-align: center;
             padding-top: 20px;
-            border-top: 1px solid #444;
-            color: #ccc;
-            font-size: 0.9rem;
+            border-top: 1px solid #34495e;
+            color: #bdc3c7;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .hero {
+                padding: 50px 20px;
+                min-height: 50vh;
+            }
+
             .hero h1 {
                 font-size: 2rem;
             }
-            .hero {
-                padding: 80px 20px;
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
-
 </head>
 <body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    Karibu Groceries
+                </div>
+                <nav class="nav-links">
+                    <a href="#products">Products</a>
+                    <a href="#features">Features</a>
+                    <div class="auth-buttons">
+                        {% if user.is_authenticated %}
+                            {% if user.is_manager %}
+                                <a href="{% url 'manager_dashboard' %}" class="btn btn-login">Dashboard</a>
+                            {% elif user.is_salesagent %}
+                                <a href="{% url 'salesagent_dashboard' %}" class="btn btn-login">Dashboard</a>
+                            {% elif user.is_owner %}
+                                <a href="{% url 'owner_dashboard' %}" class="btn btn-login">Dashboard</a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}" class="btn btn-login">Logout</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-login">Login</a>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
 
     <!-- Hero Section -->
-    <section class="hero" id="home">
+    <section class="hero">
         <div class="container">
-            <h1>WELCOME TO KARIBU GROCERY</h1>
-            <p>The fresh choice for all your grocery needs.</p>
+            <h1>Welcome to Karibu Groceries</h1>
+            <p>Your trusted source for premium cereals, beans, soybeans, and quality groceries</p>
+            <div class="hero-buttons">
+                {% if user.is_authenticated %}
+                    {% if user.is_manager or user.is_salesagent %}
+                        <a href="{% url 'makesale' %}" class="btn-primary">
+                            <i class="fas fa-shopping-cart"></i> Start Selling
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'allstock' %}" class="btn-secondary">
+                        <i class="fas fa-box"></i> View Inventory
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login to Get Started
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="container">
+            <div class="section-title">
+                <h2>Featured Products</h2>
+                <p>Explore our premium selection of cereals and groceries</p>
+            </div>
+
+            {% if featured_products %}
+                <div class="products-grid">
+                    {% for product in featured_products %}
+                        <div class="product-card">
+                            <div class="product-image {% if not product.image %}no-image{% endif %}">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.item_name }}">
+                                {% else %}
+                                    <i class="fas fa-box"></i>
+                                {% endif %}
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">{{ product.item_name }}</h3>
+                                <p class="product-category">
+                                    {% if product.category_name %}
+                                        {{ product.category_name.category_name }}
+                                    {% else %}
+                                        Groceries
+                                    {% endif %}
+                                </p>
+                                <p class="product-price">UGX {{ product.cost|default:"N/A" }}</p>
+                                <p class="product-quantity">
+                                    <i class="fas fa-weight"></i> {{ product.get_quantity_with_unit }}
+                                </p>
+                                <span class="product-status {% if product.product_quantity == 0 %}status-out-of-stock{% elif product.product_quantity < 10 %}status-low-stock{% else %}status-in-stock{% endif %}">
+                                    {{ product.get_stock_status }}
+                                </span>
+                                <div class="product-actions">
+                                    {% if user.is_authenticated and user.is_manager or user.is_salesagent %}
+                                        <a href="{% url 'makesale' %}" class="btn-small btn-view">
+                                            <i class="fas fa-shopping-cart"></i> Sell
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'login' %}" class="btn-small btn-view">
+                                            <i class="fas fa-sign-in-alt"></i> Login to Sell
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 12px;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 20px;"></i>
+                    <p style="color: #999; font-size: 1.1rem;">No products available at the moment</p>
+                </div>
+            {% endif %}
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features">
+    <section class="features" id="features">
         <div class="container">
             <div class="section-title">
                 <h2>Why Choose Us</h2>
-                <p>We're committed to providing the highest quality products with exceptional service</p>
+                <p>Quality products and reliable service</p>
             </div>
-
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🌱</div>
-                    <h3>Farm Fresh</h3>
-                    <p>Directly sourced from trusted local farmers for maximum freshness</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Premium Quality</h3>
+                    <p>We source only the finest cereals and groceries for our customers</p>
                 </div>
-
                 <div class="feature-card">
-                    <div class="feature-icon">🚚</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
                     <h3>Fast Delivery</h3>
-                    <p>Quick and reliable delivery to your home or business</p>
+                    <p>Quick and reliable delivery to your doorstep</p>
                 </div>
-
                 <div class="feature-card">
-                    <div class="feature-icon">💰</div>
-                    <h3>Best Prices</h3>
-                    <p>Competitive pricing without compromising on quality</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Our team is always ready to assist you</p>
                 </div>
-
                 <div class="feature-card">
-                    <div class="feature-icon">⭐</div>
-                    <h3>Quality Guarantee</h3>
-                    <p>We stand behind the quality of all our products</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Secure Transactions</h3>
+                    <p>Your transactions are safe and secure with us</p>
                 </div>
             </div>
         </div>
@@ -261,30 +627,55 @@
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
-            <h2>Ready to Experience the Difference?</h2>
-            <p>Join thousands of satisfied customers who trust us for their cereal and grocery needs.</p>
-
-            <a href="{% url 'login' %}" class="cta-button">Login</a>
+            <h2>Ready to Get Started?</h2>
+            <p>Join our growing community of satisfied customers and experience the best in grocery shopping</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="btn-primary">Login Now</a>
+            {% endif %}
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
-
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h3>FreshHarvest</h3>
-                    <p>Your trusted source for premium quality cereals and groceries since 2010.</p>
+                    <h3>About Us</h3>
+                    <ul>
+                        <li><a href="#">Our Story</a></li>
+                        <li><a href="#">Our Mission</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul>
+                        <li><a href="#">Cereals</a></li>
+                        <li><a href="#">Beans</a></li>
+                        <li><a href="#">Soybeans</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
                 </div>
             </div>
-
-            <div class="copyright">
-                <p>&copy; 2023 FreshHarvest. All rights reserved.</p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Karibu Groceries. All rights reserved. ✨</p>
             </div>
-
         </div>
     </footer>
-
 </body>
 </html>

@@ -70,7 +70,7 @@ class Stock(models.Model):
     last_updated = models.DateTimeField(default=timezone.now)
 
     # 📸 Image for cereals or products
-    
+    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
 
     def __str__(self):
         return self.item_name if self.item_name else "Unnamed Stock"

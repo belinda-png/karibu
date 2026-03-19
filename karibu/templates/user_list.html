@@ -2,105 +2,586 @@
 {% block title %}User Management{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">User Management</h1>
-        <a href="{% url 'add_user' %}" class="...">
-             <i class="fas fa-user-plus mr-2"></i> Add User
+<div class="user-management-container">
+    <!-- Header Section -->
+    <div class="management-header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-users"></i>
+                <h1>User Management</h1>
+            </div>
+            <a href="{% url 'add_user' %}" class="btn-add-user">
+                <i class="fas fa-user-plus"></i> Add New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button-section">
+        <a href="{% url 'manager_dashboard' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">Total Users</h3>
-                    <p class="text-2xl font-bold">{{ total_users }}</p>
-                </div>
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Users</h3>
+                <p class="stat-number">{{ total_users }}</p>
             </div>
         </div>
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                    <i class="fas fa-user-check"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">Active Users</h3>
-                    <p class="text-2xl font-bold">{{ active_users }}</p>
-                </div>
+
+        <div class="stat-card active">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Active Users</h3>
+                <p class="stat-number">{{ active_users }}</p>
             </div>
         </div>
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">Staff Members</h3>
-                    <p class="text-2xl font-bold">{{ staff_users }}</p>
-                </div>
+
+        <div class="stat-card staff">
+            <div class="stat-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Staff Members</h3>
+                <p class="stat-number">{{ staff_users }}</p>
             </div>
         </div>
     </div>
 
     <!-- Users Table -->
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="users-table-container">
+        {% if users %}
+        <table class="users-table">
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for user in users %}
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-user text-gray-600"></i>
+                <tr class="user-row {% if not user.is_active %}inactive{% else %}active{% endif %}">
+                    <td class="user-cell">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
                             </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
-                                <div class="text-sm text-gray-500">
-                                    {% if user.is_superuser %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Admin</span>
-                                    {% elif user.is_staff %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Staff</span>
-                                    {% else %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">User</span>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            <span class="username">{{ user.username }}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if user.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                            {% if user.is_active %}Active{% else %}Inactive{% endif %}
-                        </span>
+                    <td class="email-cell">{{ user.email }}</td>
+                    <td class="role-cell">
+                        <div class="role-badges">
+                            {% if user.is_owner %}
+                                <span class="badge owner-badge">
+                                    <i class="fas fa-crown"></i> Owner
+                                </span>
+                            {% endif %}
+                            {% if user.is_manager %}
+                                <span class="badge manager-badge">
+                                    <i class="fas fa-user-shield"></i> Manager
+                                </span>
+                            {% endif %}
+                            {% if user.is_salesagent %}
+                                <span class="badge agent-badge">
+                                    <i class="fas fa-user-secret"></i> Sales Agent
+                                </span>
+                            {% endif %}
+                            {% if user.is_staff and not user.is_owner and not user.is_manager and not user.is_salesagent %}
+                                <span class="badge staff-badge">
+                                    <i class="fas fa-user-shield"></i> Staff
+                                </span>
+                            {% endif %}
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.date_joined|date:"M d, Y" }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'edit_user' user.id %}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                        <a href="{% url 'deactivate_user' user.id %}" class="text-red-600 hover:text-red-900">Delete</a>
-                        <a href="{% url 'user_list' %}" class="bg-gray-700 rounded-lg text-white px-4 py-2 shadow"> Back </a>
+                    <td class="status-cell">
+                        {% if user.is_active %}
+                            <span class="status-badge active">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        {% else %}
+                            <span class="status-badge inactive">
+                                <i class="fas fa-times-circle"></i> Inactive
+                            </span>
+                        {% endif %}
                     </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No users found</td>
+                    <td class="date-cell">
+                        {% if user.last_login %}
+                            {{ user.last_login|date:"M d, Y H:i" }}
+                        {% else %}
+                            <span class="text-muted">Never</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="action-buttons">
+                            <a href="{% url 'edit_user' user.id %}" class="btn-action edit" title="Edit User">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            {% if user.is_active %}
+                                <a href="{% url 'deactivate_user' user.id %}" class="btn-action deactivate" title="Deactivate User" onclick="return confirm('Deactivate this user?');">
+                                    <i class="fas fa-ban"></i>
+                                </a>
+                            {% else %}
+                                <a href="{% url 'reactivate_user' user.id %}" class="btn-action activate" title="Activate User" onclick="return confirm('Activate this user?');">
+                                    <i class="fas fa-check-circle"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <div class="no-users-message">
+            <i class="fas fa-inbox"></i>
+            <h3>No Users Found</h3>
+            <p>Try adjusting your search criteria.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    /* Base Styles */
+    .user-management-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f5f7fa;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Header */
+    .management-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 30px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title i {
+        font-size: 2rem;
+    }
+
+    .header-title h1 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+
+    /* Back Button Section */
+    .back-button-section {
+        max-width: 1200px;
+        margin: 0 auto 20px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .btn-back:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Add User Button */
+    .btn-add-user {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .btn-add-user:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    /* Statistics Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        max-width: 1200px;
+        margin: 0 auto 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .stat-card.total .stat-icon {
+        background-color: #3498db;
+    }
+
+    .stat-card.active .stat-icon {
+        background-color: #2ecc71;
+    }
+
+    .stat-card.staff .stat-icon {
+        background-color: #f39c12;
+    }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-content h3 {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .stat-number {
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    /* Users Table Container */
+    .users-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    /* Users Table */
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .users-table thead th {
+        background-color: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .users-table tbody tr {
+        border-bottom: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+
+    .users-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .users-table tbody tr.inactive {
+        opacity: 0.6;
+    }
+
+    .users-table td {
+        padding: 15px 20px;
+        vertical-align: middle;
+    }
+
+    /* User Cell */
+    .user-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .username {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Email Cell */
+    .email-cell {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Role Cell */
+    .role-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .role-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .badge.owner-badge {
+        background-color: #9b59b6;
+        color: white;
+    }
+
+    .badge.manager-badge {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .badge.agent-badge {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .badge.staff-badge {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    /* Status Cell */
+    .status-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Date Cell */
+    .date-cell {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .text-muted {
+        color: #999;
+    }
+
+    /* Actions Cell */
+    .actions-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-action.edit {
+        background-color: #3498db;
+    }
+
+    .btn-action.edit:hover {
+        background-color: #2980b9;
+        transform: translateY(-1px);
+    }
+
+    .btn-action.deactivate {
+        background-color: #e74c3c;
+    }
+
+    .btn-action.deactivate:hover {
+        background-color: #c0392b;
+        transform: translateY(-1px);
+    }
+
+    .btn-action.activate {
+        background-color: #2ecc71;
+    }
+
+    .btn-action.activate:hover {
+        background-color: #27ae60;
+        transform: translateY(-1px);
+    }
+
+    /* No Users Message */
+    .no-users-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .no-users-message i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .no-users-message h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.2rem;
+    }
+
+    .no-users-message p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .users-table {
+            font-size: 0.85rem;
+        }
+
+        .users-table td {
+            padding: 10px 12px;
+        }
+
+        .users-table thead th {
+            padding: 10px 12px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+        }
+
+        .role-badges {
+            flex-direction: column;
+        }
+    }
+</style>
 {% endblock %}

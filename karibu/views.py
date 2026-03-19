@@ -32,7 +32,12 @@ from django.contrib.auth import login, logout
 
 # Custom decorator for role-based permissions
 def index(request):
-    return render(request, "index.html")
+    # Landing page showing featured products
+    featured_products = Stock.objects.filter(product_quantity__gt=0).order_by('-date_added')[:6]
+    context = {
+        'featured_products': featured_products,
+    }
+    return render(request, "index.html", context)
 
 
 def is_manager_check(user):  # Proper alignment
@@ -121,15 +126,25 @@ def deletestock(request, stock_id):
 
 
 def makesale(request):
+    # Show product gallery for sales
     if request.method == "POST":
         form = AddSaleForm(request.POST)
         if form.is_valid():
-            sale = form.save()
+            sale = form.save(commit=False)
+            sale.sales_agent = request.user
+            sale.save()
             return redirect("receipt", sale_id=sale.id)
     else:
         form = AddSaleForm()
-
-    return render(request, "sell_item.html", {"form": form})
+    
+    # Get all available products for the gallery
+    products = Stock.objects.filter(product_quantity__gt=0).select_related('category_name')
+    
+    context = {
+        'form': form,
+        'products': products,
+    }
+    return render(request, "sell_item.html", context)
 
 
 def save(self, commit=True):
@@ -534,11 +549,17 @@ from .forms import UserCreationForm
 
 
 def signup(request):
+    # Only managers can create new users
+    if not request.user.is_authenticated or not request.user.is_manager:
+        messages.error(request, "Only managers can create new users.")
+        return redirect("login")
+    
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("login")  # Redirect after successful signup
+            messages.success(request, "User created successfully!")
+            return redirect("user_list")
     else:
         form = UserCreationForm()
     return render(request, "signup.html", {"form": form})
@@ -657,37 +678,102 @@ def custom_logout(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_owner)
 def user_list(request):
+    """
+    Owner-only user management page
+    Shows all users with filtering, search, and management options
+    """
+    # Get query parameters
+    search_query = request.GET.get('search', '')
+    role_filter = request.GET.get('role', '')
+    status_filter = request.GET.get('status', '')
+    
+    # Start with all users
     users = User_profile.objects.all().order_by("-date_joined")
-    return render(
-        request,
-        "user_list.html",
-        {
-            "users": users,
-            "total_users": users.count(),
-            "active_users": users.filter(is_active=True).count(),
-            "staff_users": users.filter(is_staff=True).count(),
-        },
-    )
+    
+    # Apply search filter
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Apply role filter
+    if role_filter:
+        if role_filter == 'owner':
+            users = users.filter(is_owner=True)
+        elif role_filter == 'manager':
+            users = users.filter(is_manager=True)
+        elif role_filter == 'salesagent':
+            users = users.filter(is_salesagent=True)
+        elif role_filter == 'staff':
+            users = users.filter(is_staff=True)
+    
+    # Apply status filter
+    if status_filter:
+        if status_filter == 'active':
+            users = users.filter(is_active=True)
+        elif status_filter == 'inactive':
+            users = users.filter(is_active=False)
+    
+    # Pagination
+    paginator = Paginator(users, 10)  # Show 10 users per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Calculate statistics
+    total_users = User_profile.objects.count()
+    active_users = User_profile.objects.filter(is_active=True).count()
+    inactive_users = User_profile.objects.filter(is_active=False).count()
+    managers = User_profile.objects.filter(is_manager=True).count()
+    sales_agents = User_profile.objects.filter(is_salesagent=True).count()
+    owners = User_profile.objects.filter(is_owner=True).count()
+    
+    context = {
+        "page_obj": page_obj,
+        "users": page_obj,
+        "search_query": search_query,
+        "role_filter": role_filter,
+        "status_filter": status_filter,
+        "total_users": total_users,
+        "active_users": active_users,
+        "inactive_users": inactive_users,
+        "managers": managers,
+        "sales_agents": sales_agents,
+        "owners": owners,
+    }
+    
+    return render(request, "user_list.html", context)
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+@user_passes_test(lambda u: u.is_owner)
 def add_user(request):
+    """
+    Owner-only user creation page
+    """
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             messages.success(request, f"User {user.username} created successfully!")
             return redirect("user_list")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = UserCreationForm()
     return render(request, "add_user.html", {"form": form})
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+@user_passes_test(lambda u: u.is_owner)
 def edit_user(request, user_id):
+    """
+    Owner-only user editing page
+    """
     user = get_object_or_404(User_profile, pk=user_id)
     if request.method == "POST":
         form = UserEditForm(request.POST, instance=user)
@@ -695,21 +781,74 @@ def edit_user(request, user_id):
             form.save()
             messages.success(request, f"User {user.username} updated successfully!")
             return redirect("user_list")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = UserEditForm(instance=user)
     return render(request, "edit_user.html", {"form": form, "user": user})
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+@user_passes_test(lambda u: u.is_owner)
 def deactivate_user(request, user_id):
+    """
+    Owner-only user deactivation page
+    Deactivates a user (removes access without deleting)
+    """
     user = get_object_or_404(User_profile, pk=user_id)
+    
+    # Prevent deactivating the current user
+    if user.id == request.user.id:
+        messages.error(request, "You cannot deactivate your own account!")
+        return redirect("user_list")
+    
     if request.method == "POST":
         user.is_active = False
         user.save()
-        messages.success(request, f"User {user.username} deactivated successfully!")
+        messages.success(request, f"User {user.username} has been deactivated successfully!")
         return redirect("user_list")
     return render(request, "confirm_deactivate.html", {"user": user})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_owner)
+def delete_user(request, user_id):
+    """
+    Owner-only user deletion page
+    Permanently deletes a user from the system
+    """
+    user = get_object_or_404(User_profile, pk=user_id)
+    
+    # Prevent deleting the current user
+    if user.id == request.user.id:
+        messages.error(request, "You cannot delete your own account!")
+        return redirect("user_list")
+    
+    if request.method == "POST":
+        username = user.username
+        user.delete()
+        messages.success(request, f"User {username} has been permanently deleted from the system!")
+        return redirect("user_list")
+    return render(request, "confirm_delete_user.html", {"user": user})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_owner)
+def reactivate_user(request, user_id):
+    """
+    Owner-only user reactivation page
+    Reactivates a deactivated user
+    """
+    user = get_object_or_404(User_profile, pk=user_id)
+    
+    if request.method == "POST":
+        user.is_active = True
+        user.save()
+        messages.success(request, f"User {user.username} has been reactivated successfully!")
+        return redirect("user_list")
+    return render(request, "confirm_reactivate_user.html", {"user": user})
 
 
 @login_required

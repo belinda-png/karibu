@@ -1,315 +1,559 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karibu Groceries - Login</title>
-  {% load static %}
-{% block content %}
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karibu Groceries - Professional Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% load static %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-    }
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      background: #1d580a;
-      margin: 0;
-      padding: 0;
-    }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-    .container {
-      display: flex;
-      height: 100vh;
-      width: 100%;
-      gap: 0;
-    }
-    .left-section,
-.right-section {
-  flex: 1;     /* Both sides take equal width */
-  max-width: 50%;
-}
+        .login-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 95%;
+            max-width: 1200px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
 
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .left-section {
-      /* flex: 1; */
-      background: url("{% static 'images/banana.jpeg' %}") no-repeat center center/cover;
-      padding: 4rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: white;
-      position: relative;
-      margin: 0;
-    }
+        /* Left Section - Branding */
+        .login-left {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .left-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(3px);
-      z-index: 1;
-    }
+        .login-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
 
-    .left-content {
-      position: relative;
-      z-index: 2;
-      max-width: 600px;
-    }
+        .login-left::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
 
-    .left-content h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-      color: #7DE5B6;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
 
-    .left-content p {
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-      opacity: 0.9;
-      line-height: 1.6;
-    }
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
 
-    .tagline {
-      font-size: 1.8rem;
-      font-style: italic;
-      color: #FFD700;
-      font-family: 'Brush Script MT', cursive;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
+        .brand-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
 
-    .signup-link {
-      position: absolute;
-      bottom: 3rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
-      color: white;
-      font-size: 1rem;
-    }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
 
-    .signup-link a {
-      color: #7DE5B6;
-      text-decoration: none;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
+        .brand-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
 
-    .right-section {
-      /* flex: 0 0 500px; */
-      padding: 3rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin: 0;
-    }
+        .brand-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
 
-    /* Transparent login card */
-    .login-box {
-      background: transparent !important;
-      padding: 2.5rem;
-      border-radius: 12px;
-      box-shadow: none !important;
-      color: white;
-    }
+        .brand-features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+            text-align: left;
+        }
 
-    .login-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: white !important;
-    }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
 
-    .key-icon {
-      font-size: 1.5rem;
-    }
+        .feature-item i {
+            font-size: 18px;
+            color: #4caf50;
+        }
 
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
+        /* Right Section - Login Form */
+        .login-right {
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: white !important;
-      font-weight: 500;
-      font-size: 0.95rem;
-    }
+        .login-header {
+            margin-bottom: 40px;
+        }
 
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 6px;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      transition: border-color 0.3s, background 0.3s;
-    }
+        .login-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
 
-    .form-group input:focus {
-      outline: none;
-      border-color: #7DE5B6;
-      background: rgba(255, 255, 255, 0.2);
-    }
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
 
-    .privacy-note {
-      font-size: 0.85rem;
-      color: #ccc;
-      margin-top: 0.5rem;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-    .remember-me input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
 
-    .remember-me label {
-      color: white !important;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
 
-    .login-btn {
-      width: 100%;
-      padding: 0.9rem;
-      background: #0d3b66;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+        .form-group input::placeholder {
+            color: #bdc3c7;
+        }
 
-    .login-btn:hover {
-      background: #0b2f54;
-    }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
 
-    .forgot-password {
-      margin-top: 1.5rem;
-      text-align: center;
-    }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .forgot-password-link {
-      color: #C85D5D;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 1rem;
-    }
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2e7d32;
+        }
 
-    .forgot-password-link:hover {
-      text-decoration: underline;
-    }
+        .remember-me label {
+            color: #2c3e50;
+            cursor: pointer;
+            font-weight: 500;
+        }
 
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
+        .forgot-password a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
 
-      .left-section {
-        flex: 0 0 40%;
-        padding: 2rem;
-      }
+        .forgot-password a:hover {
+            color: #1b5e20;
+            text-decoration: underline;
+        }
 
-      .left-content h1 {
-        font-size: 2rem;
-      }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-      .right-section {
-        flex: 1;
-        padding: 2rem;
-      }
-    }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+        }
 
-  </style>
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn i {
+            font-size: 18px;
+        }
+
+        .error-messages {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error-messages i {
+            font-size: 18px;
+        }
+
+        .signup-prompt {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .signup-prompt a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signup-prompt a:hover {
+            color: #1b5e20;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #bdc3c7;
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ecf0f1;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .login-left {
+                padding: 40px 30px;
+                min-height: 300px;
+            }
+
+            .login-right {
+                padding: 40px 30px;
+            }
+
+            .brand-title {
+                font-size: 24px;
+            }
+
+            .login-header h2 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                grid-template-columns: 1fr;
+            }
+
+            .login-left {
+                padding: 30px 20px;
+                min-height: 40vh;
+            }
+
+            .login-right {
+                padding: 30px 20px;
+                min-height: 60vh;
+            }
+
+            .brand-title {
+                font-size: 20px;
+            }
+
+            .brand-subtitle {
+                font-size: 12px;
+            }
+
+            .brand-features {
+                display: none;
+            }
+
+            .login-header h2 {
+                font-size: 20px;
+            }
+
+            .form-group input {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            .login-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+
+        /* Loading state */
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .login-btn.loading {
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="left-section">
-      <div class="left-content">
-        <h1>Welcome to Karibu Groceries Limited</h1>
-        <p>Your workspace awaits—log in to continue. Track sales, manage inventory,<br>
-          and oversee operations all from your dashboard. Sign in to get started!</p>
-        <div class="tagline">Freshness Delivered to Your Doorstep!</div>
-      </div>
-      <div class="signup-link">
-        Don't have an account?
-        <a href="{% url 'signup' %}">📋 Sign up</a>
-      </div>
-    </div>
-
-    <div class="right-section">
-      <div class="login-box">
-        <div class="login-header">
-          <span class="key-icon">🔑</span>
-          Sign in
-        </div>
-        <form method="post" action="{% url 'login' %}" class="auth-form">
-          {% csrf_token %}
-
-          {% if form.non_field_errors %}
-            <div class="error-messages">
-              {% for error in form.non_field_errors %}
-                <div class="error">{{ error }}</div>
-              {% endfor %}
+    <div class="login-container">
+        <!-- Left Section -->
+        <div class="login-left">
+            <div class="brand-content">
+                <div class="brand-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h1 class="brand-title">Karibu Groceries</h1>
+                <p class="brand-subtitle">
+                    Manage your inventory, track sales, and grow your business with our comprehensive management system.
+                </p>
+                <div class="brand-features">
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Real-time Sales Tracking</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-boxes"></i>
+                        <span>Inventory Management</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Team Collaboration</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-lock"></i>
+                        <span>Secure & Reliable</span>
+                    </div>
+                </div>
             </div>
-          {% endif %}
+        </div>
 
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="your username" required>
-          </div>
+        <!-- Right Section -->
+        <div class="login-right">
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account to continue</p>
+            </div>
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="your password" required>
-          </div>
+            <form method="post" action="{% url 'login' %}" class="login-form">
+                {% csrf_token %}
 
-          <div class="remember-me">
-            <input type="checkbox" id="remember" name="remember_me">
-            <label for="remember">Remember me</label>
-          </div>
+                {% if form.non_field_errors %}
+                    <div class="error-messages">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
 
-          <button type="submit" class="login-btn">Login</button>
-        </form>
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter your username"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
 
-      </div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember_me">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#"><i class="fas fa-question-circle"></i> Need help?</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>New to Karibu?</span>
+            </div>
+
+            <div class="signup-prompt">
+                Contact your manager to create an account
+                <br>
+                <small style="color: #95a5a6;">Only managers can create new user accounts</small>
+            </div>
+        </div>
     </div>
-  </div>
-  
-{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login-form');
+            const submitBtn = document.querySelector('.login-btn');
+
+            form.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                submitBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+            });
+
+            // Add input focus effects
+            const inputs = document.querySelectorAll('.form-group input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

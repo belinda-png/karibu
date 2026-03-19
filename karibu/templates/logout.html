@@ -1,21 +1,242 @@
-{% extends 'base.html' %}
-{% block title %}Logout{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged Out - Karibu Groceries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
-    <h2 class="text-2xl font-bold mb-6 text-center">Logout Confirmation</h2>
-    <p class="mb-6 text-center">Are you sure you want to logout?</p>
-    
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <div class="flex justify-between">
-            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                Yes, Logout
-            </button>
-            <a href="{% url 'home' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
-                Cancel
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logout-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 95%;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logout-icon {
+            font-size: 80px;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            animation: checkmark 0.6s ease-out;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .logout-message {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .logout-details {
+            background: #f8f9fa;
+            border-left: 4px solid #2e7d32;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-item i {
+            color: #2e7d32;
+            font-size: 16px;
+            min-width: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 2px solid #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background: #bdc3c7;
+            color: white;
+        }
+
+        .security-note {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .security-note i {
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .logout-container {
+                padding: 40px 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .logout-icon {
+                font-size: 60px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <div class="logout-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h1>You've Been Logged Out</h1>
+
+        <p class="logout-message">
+            Your session has been securely closed. Thank you for using Karibu Groceries!
+        </p>
+
+        <div class="logout-details">
+            <div class="detail-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Your account is secure</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-lock"></i>
+                <span>Session terminated successfully</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock"></i>
+                <span>You can log back in anytime</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In Again
+            </a>
+            <a href="{% url 'index' %}" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Go to Home
             </a>
         </div>
-    </form>
-</div>
-{% endblock %}
+
+        <div class="security-note">
+            <i class="fas fa-info-circle"></i>
+            <span>For security, always log out when using a shared device</span>
+        </div>
+    </div>
+</body>
+</html>

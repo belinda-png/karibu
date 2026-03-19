@@ -81,6 +81,8 @@ urlpatterns = [
     path("users/add/", views.add_user, name="add_user"),
     path("users/edit/<int:user_id>/", views.edit_user, name="edit_user"),
     path("users/deactivate/<int:user_id>/", views.deactivate_user, name="deactivate_user"),
+    path("users/delete/<int:user_id>/", views.delete_user, name="delete_user"),
+    path("users/reactivate/<int:user_id>/", views.reactivate_user, name="reactivate_user"),
 ]
 
 # Serve media files during development

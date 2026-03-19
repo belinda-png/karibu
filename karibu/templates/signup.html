@@ -1,275 +1,539 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
-
-<style>
-:root {
-    --primary-green: #6EE7B7;
-    --accent-pink: #f472b6;
-    --background-light: #D9FBE9;
-    --text-dark: #000;
-    --error-color: #e74c3c;
-}
-
-/* Full-page background */
-.auth-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url("{% static 'images/mama.jpeg' %}") no-repeat center center/cover;
-    position: relative;
-}
-
-/* Transparent overlay for better text visibility */
-.auth-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-}
-
-/* Signup form wrapper */
-.auth-form-container {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    inset: 0;
-    /* Transparent card */
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50px;
-    z-index: 2;
-    backdrop-filter: blur(1px); /* Glass effect */
-}
-
-/* Center text */
-.auth-form-card {
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    padding: 0.5rem;
-}
-
-.auth-form-card h2 {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.5rem;
-}
-
-/* Form fields */
-.form-group {
-    margin-bottom: 1.2rem;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: #f2f2f2;
-    margin-bottom: 0.3rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.15);
-    color: white;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 2px rgba(110, 231, 183, 0.4);
-}
-
-/* Errors */
-.error {
-    color: #ffb3b3;
-    font-size: 0.9rem;
-    margin-top: 0.3rem;
-}
-
-.non-field-errors {
-    background-color: rgba(255, 0, 0, 0.15);
-    border: 1px solid #ff6666;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-/* Button */
-.btn-primary {
-    background-color: var(--primary-green);
-    color: black;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    width: 100%;
-    transition: all 0.2s;
-}
-
-.btn-primary:hover {
-    background-color: #34d399;
-    transform: translateY(-2px);
-}
-
-/* Login link */
-.login-link {
-    margin-top: 1rem;
-    color: white;
-}
-
-.login-link a {
-    color: var(--primary-green);
-    font-weight: bold;
-}
-
-/* Radio button styling */
-.radio-choice {
-    margin-bottom: 0.5rem;
-}
-
-.radio-choice input[type="radio"] {
-    margin-right: 0.5rem;
-}
-
-/* Hide branch group initially for owner */
-#branch-group {
-    transition: all 0.3s ease;
-}
-
-#branch-group.hidden {
-    display: none;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const user_type_radios = document.querySelectorAll('input[name="user_type"]');
-    const branch_group = document.getElementById('branch-group');
-    
-    function toggleBranchSelection() {
-        const selected_user_type = document.querySelector('input[name="user_type"]:checked').value;
-        
-        if (selected_user_type === 'owner') {
-            // Hide branch selection for owners
-            branch_group.classList.add('hidden');
-            // Clear any selected branches for owners
-            const branch_checkboxes = branch_group.querySelectorAll('input[type="checkbox"]');
-            branch_checkboxes.forEach(checkbox => checkbox.checked = false);
-        } else {
-            // Show branch selection for managers and sales agents
-            branch_group.classList.remove('hidden');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Karibu Groceries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% load crispy_forms_tags %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    }
-    
-    // Add event listeners to all radio buttons
-    user_type_radios.forEach(radio => {
-        radio.addEventListener('change', toggleBranchSelection);
-    });
-    
-    // Initial check on page load
-    if (document.querySelector('input[name="user_type"]:checked')) {
-        toggleBranchSelection();
-    }
-});
-</script>
 
-<div class="auth-container">
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    <div class="auth-form-container">
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
 
-        <div class="auth-form-card">
-            <h2>📝 Create an Account</h2>
+        .signup-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
 
-            {% if form.non_field_errors %}
-                <div class="non-field-errors">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-            <form method="post">
-                {% csrf_token %}
+        .signup-header {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
 
-                <div class="form-group">
-                    {{ form.username.label_tag }}
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="error">{{ form.username.errors }}</div>
-                    {% endif %}
-                </div>
+        .signup-header-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
 
-                <div class="form-group">
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="error">{{ form.email.errors }}</div>
-                    {% endif %}
-                </div>
+        .signup-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
 
-                <div class="form-group" id="branch-group">
-                    {{ form.branch.label_tag }}
-                    {{ form.branch }}
-                    {% if form.branch.errors %}
-                        <div class="error">{{ form.branch.errors }}</div>
-                    {% endif %}
-                    <small class="form-text text-muted" style="color: #ccc; font-size: 0.8rem;">
-                        Select the branches this user will have access to. Owners have access to all branches.
-                    </small>
-                </div>
+        .signup-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-                <div class="form-group">
-                    <label>I am a:</label>
-                    {% for choice in form.user_type %}
-                        <div class="radio-choice">
-                            {{ choice.tag }}
-                            <label style="color:white" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
-                        </div>
-                    {% endfor %}
-                    <small class="form-text text-muted" style="color: #ccc; font-size: 0.8rem;">
-                        Owner: Full access to all branches<br>
-                        Manager: Access to selected branches<br>
-                        Sales Agent: Access to selected branches only
-                    </small>
-                </div>
+        .signup-content {
+            padding: 40px 30px;
+        }
 
-                <div class="form-group">
-                    {{ form.password1.label_tag }}
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        <div class="error">{{ form.password1.errors }}</div>
-                    {% endif %}
-                </div>
+        .form-section {
+            margin-bottom: 30px;
+        }
 
-                <div class="form-group">
-                    {{ form.password2.label_tag }}
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="error">{{ form.password2.errors }}</div>
-                    {% endif %}
-                </div>
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
 
-                <button type="submit" class="btn-primary">Sign Up</button>
-            </form>
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-            <div class="login-link">
-                Already have an account? <a href="{% url 'login' %}">Log in</a>
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2e7d32;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #bdc3c7;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-item,
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-item:hover,
+        .checkbox-item:hover {
+            border-color: #2e7d32;
+            background: #f0f7f0;
+        }
+
+        .radio-item input[type="radio"],
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2e7d32;
+        }
+
+        .radio-item label,
+        .checkbox-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .password-requirements {
+            background: #f0f7f0;
+            border-left: 4px solid #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-item i {
+            font-size: 14px;
+            color: #2e7d32;
+        }
+
+        .error-messages {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .error-messages ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .error-messages li {
+            margin-bottom: 5px;
+        }
+
+        .success-messages {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 2px solid #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background: #bdc3c7;
+            color: white;
+        }
+
+        .signup-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .signup-footer a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1565c0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box i {
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                border-radius: 0;
+            }
+
+            .signup-header {
+                padding: 30px 20px;
+            }
+
+            .signup-header h1 {
+                font-size: 24px;
+            }
+
+            .signup-content {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <div class="signup-header-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1>Create Account</h1>
+            <p>Manager-Only Account Creation</p>
+        </div>
+
+        <div class="signup-content">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <span>Only managers can create new user accounts. Contact your manager if you need an account.</span>
             </div>
 
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="success-messages">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="signup-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="error-messages">
+                        <strong>Error:</strong>
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Account Information -->
+                <div class="form-section">
+                    <div class="form-section-title">Account Information</div>
+
+                    <div class="form-group">
+                        <label for="id_username">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="error-messages">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="error-messages">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-section">
+                    <div class="form-section-title">Password</div>
+
+                    <div class="form-group">
+                        <label for="id_password1">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="error-messages">{{ form.password1.errors }}</div>
+                        {% endif %}
+                        <div class="password-requirements">
+                            <div class="requirement-item">
+                                <i class="fas fa-check"></i>
+                                <span>At least 8 characters</span>
+                            </div>
+                            <div class="requirement-item">
+                                <i class="fas fa-check"></i>
+                                <span>One uppercase letter (A-Z)</span>
+                            </div>
+                            <div class="requirement-item">
+                                <i class="fas fa-check"></i>
+                                <span>One lowercase letter (a-z)</span>
+                            </div>
+                            <div class="requirement-item">
+                                <i class="fas fa-check"></i>
+                                <span>One number (0-9)</span>
+                            </div>
+                            <div class="requirement-item">
+                                <i class="fas fa-check"></i>
+                                <span>One special character (!@#$%^&*)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password2">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="error-messages">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- User Type -->
+                <div class="form-section">
+                    <div class="form-section-title">User Type</div>
+                    <div class="radio-group">
+                        {% for value, label in form.user_type.field.choices %}
+                            <div class="radio-item">
+                                <input type="radio" id="id_user_type_{{ forloop.counter }}" name="user_type" value="{{ value }}" required>
+                                <label for="id_user_type_{{ forloop.counter }}">{{ label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.user_type.errors %}
+                        <div class="error-messages">{{ form.user_type.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Branches -->
+                <div class="form-section">
+                    <div class="form-section-title">Assign Branches</div>
+                    <div class="checkbox-group">
+                        {% for value, label in form.branch.field.choices %}
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="id_branch_{{ forloop.counter }}" name="branch" value="{{ value }}">
+                                <label for="id_branch_{{ forloop.counter }}">{{ label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.branch.errors %}
+                        <div class="error-messages">{{ form.branch.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i>
+                        Create Account
+                    </button>
+                    <a href="{% url 'login' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <div class="signup-footer">
+                Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+            </div>
         </div>
     </div>
-</div>
 
-{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.signup-form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            form.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+            });
+
+            // Add input focus effects
+            const inputs = document.querySelectorAll('.form-group input, .form-group select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // User type change handler
+            const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+            const branchSection = document.querySelector('[class*="form-section"]:has(input[name="branch"])');
+
+            userTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'owner') {
+                        branchSection.style.opacity = '0.5';
+                        branchSection.style.pointerEvents = 'none';
+                    } else {
+                        branchSection.style.opacity = '1';
+                        branchSection.style.pointerEvents = 'auto';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
