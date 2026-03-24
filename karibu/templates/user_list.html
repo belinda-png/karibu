@@ -18,9 +18,15 @@
 
     <!-- Back Button -->
     <div class="back-button-section">
-        <a href="{% url 'manager_dashboard' %}" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
+        {% if request.user.is_owner %}
+            <a href="{% url 'owner_dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        {% else %}
+            <a href="{% url 'manager_dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        {% endif %}
     </div>
 
     <!-- Statistics Cards -->
